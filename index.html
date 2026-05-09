@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小神童认字乐园</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes bounceIn {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes confetti-fall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  @keyframes starBurst {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; }
+    100% { transform: scale(2) rotate(180deg); opacity: 0; }
+  }
+  @keyframes rainbowBorder {
+    0% { border-color: #FF6B6B; }
+    16% { border-color: #FFD93D; }
+    33% { border-color: #6BCB77; }
+    50% { border-color: #4D96FF; }
+    66% { border-color: #9B59B6; }
+    83% { border-color: #FF6B9D; }
+    100% { border-color: #FF6B6B; }
+  }
+  @keyframes celebrationBounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    25% { transform: translateY(-20px) scale(1.1); }
+    50% { transform: translateY(0) scale(1); }
+    75% { transform: translateY(-10px) scale(1.05); }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 5px rgba(107,203,119,0.5); }
+    50% { box-shadow: 0 0 15px rgba(107,203,119,0.9); }
+  }
+  @keyframes pulseWarn {
+    0%, 100% { box-shadow: 0 0 5px rgba(255,217,61,0.5); }
+    50% { box-shadow: 0 0 15px rgba(255,217,61,0.9); }
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .bg-deco {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .bg-deco span {
+    position: absolute; font-size: 30px; opacity: 0.15;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .app {
+    position: relative; z-index: 1;
+    max-width: 480px; margin: 0 auto; padding: 16px;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+
+  /* ====== 顶部 ====== */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0 6px;
+    gap: 10px;
+  }
+  .header h1 {
+    color: #fff; font-size: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+  .header h1 span { font-size: 26px; }
+  .header-actions { display: flex; align-items: center; gap: 8px; }
+  .lang-toggle {
+    background: rgba(255,255,255,0.9); color: #764ba2;
+    border: 1px solid rgba(255,255,255,0.95); border-radius: 16px;
+    padding: 5px 9px; font-size: 11px; font-weight: 800;
+    cursor: pointer; white-space: nowrap;
+  }
+  .stats { display: flex; gap: 6px; }
+  .stat-badge {
+    background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+    border-radius: 20px; padding: 5px 10px;
+    color: #fff; font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; gap: 3px;
+  }
+  .stat-badge.green { background: rgba(107,203,119,0.3); }
+  .stat-badge.red { background: rgba(255,107,107,0.3); }
+
+  /* ====== 文件状态条 ====== */
+  .file-status-bar {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.12); border-radius: 12px;
+    padding: 8px 14px; margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .file-status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #FFD93D; flex-shrink: 0;
+  }
+  .file-status-dot.connected { background: #6BCB77; animation: pulseGlow 2s infinite; }
+  .file-status-dot.unsaved { background: #FFD93D; animation: pulseWarn 1.5s infinite; }
+  .file-status-dot.local { background: #4D96FF; }
+  .file-status-text {
+    flex: 1; color: rgba(255,255,255,0.8); font-size: 12px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .btn-file {
+    background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; padding: 4px 10px; border-radius: 8px;
+    font-size: 11px; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-file:hover { background: rgba(255,255,255,0.35); }
+  .btn-file.primary {
+    background: rgba(107,203,119,0.4); border-color: rgba(107,203,119,0.6);
+  }
+  .btn-file.primary:hover { background: rgba(107,203,119,0.6); }
+
+  /* ====== 关卡 ====== */
+  .level-bar {
+    display: flex;
+    gap: 5px;
+    overflow-x: auto;
+    padding: 0 0 6px;
+    margin-bottom: 8px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  .level-bar::-webkit-scrollbar { height: 4px; }
+  .level-bar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+  .level-scroll-wrap {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    align-items: flex-start;
+  }
+  .level-scroll-wrap::-webkit-scrollbar { height: 4px; }
+  .level-scroll-wrap::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+  .level-section { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+  .level-section-label {
+    font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.55);
+    padding: 2px 8px; background: rgba(255,255,255,0.1);
+    border-radius: 8px; white-space: nowrap; text-align: center;
+  }
+  .level-section-label.k { background: rgba(107,203,119,0.2); color: #6BCB77; }
+  .level-section-label.g1s1 { background: rgba(77,150,255,0.2); color: #4D96FF; }
+  .level-section-label.g1s2 { background: rgba(155,89,182,0.2); color: #9B59B6; }
+  .level-row { display: flex; gap: 5px; }
+  .level-btn {
+    background: rgba(255,255,255,0.2); border: 2px solid transparent;
+    border-radius: 12px; padding: 4px 10px; color: #fff;
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    transition: all 0.3s; white-space: nowrap;
+  }
+  .level-btn:hover { background: rgba(255,255,255,0.35); }
+  .level-btn.active {
+    background: rgba(255,255,255,0.9); color: #764ba2;
+    border-color: #fff; transform: scale(1.05);
+  }
+  .level-btn.lock { opacity: 0.45; cursor: default; }
+  .level-btn.done { opacity: 0.7; }
+  .level-btn.done::before { content: '✅ '; }
+
+  /* ====== 进度条 ====== */
+  .progress-wrap {
+    background: rgba(255,255,255,0.2); border-radius: 10px;
+    height: 6px; margin-bottom: 10px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 10px;
+    background: linear-gradient(90deg, #FFD93D, #FF6B6B);
+    transition: width 0.5s ease;
+  }
+
+  /* ====== 模式切换 ====== */
+  .mode-bar { display: flex; gap: 8px; margin-bottom: 10px; }
+  .mode-btn {
+    flex: 1; padding: 9px; border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 14px; background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all 0.3s; text-align: center;
+  }
+  .mode-btn.active {
+    background: rgba(255,255,255,0.9); color: #764ba2; border-color: #fff;
+  }
+  .mode-btn .mode-icon { font-size: 16px; display: block; margin-bottom: 1px; }
+  .mode-btn .mode-sub { font-size: 10px; font-weight: 400; opacity: 0.8; }
+
+  /* ====== 复习模式提示 ====== */
+  .review-banner {
+    background: linear-gradient(135deg, #FF6B6B, #FFD93D);
+    border-radius: 14px; padding: 9px 16px;
+    text-align: center; color: #fff; font-size: 12px; font-weight: 700;
+    margin-bottom: 10px; animation: slideDown 0.3s ease;
+  }
+  .review-banner span { opacity: 0.9; font-weight: 400; font-size: 11px; }
+
+  /* ====== 卡片区域 ====== */
+  .card-area {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 14px;
+  }
+  .char-card {
+    width: 250px; height: 260px;
+    background: #fff; border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    border: 4px solid transparent;
+    animation: bounceIn 0.5s ease, rainbowBorder 4s linear infinite;
+    transition: transform 0.3s;
+  }
+  .char-card:hover { transform: scale(1.02); }
+  .char-card .char-bg {
+    position: absolute; font-size: 170px; opacity: 0.06;
+    font-weight: 900; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .char-card .pinyin {
+    font-size: 26px; color: #FF6B6B; font-weight: 700;
+    margin-bottom: 2px; position: relative; z-index: 1;
+  }
+  .char-card .character {
+    font-size: 110px; font-weight: 900; color: #333;
+    line-height: 1; position: relative; z-index: 1;
+  }
+  .char-card .hint {
+    font-size: 13px; color: #999; margin-top: 6px;
+    position: relative; z-index: 1;
+  }
+  .char-card .speaker {
+    position: absolute; top: 12px; right: 12px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none; color: #fff; font-size: 16px;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: transform 0.2s; z-index: 2;
+  }
+  .char-card .speaker:active { transform: scale(0.9); }
+  .char-record-badge {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(255,255,255,0.95); border-radius: 20px;
+    padding: 2px 8px; font-size: 10px; font-weight: 700;
+    display: flex; gap: 5px; z-index: 2; border: 1px solid #eee;
+  }
+  .char-record-badge .know { color: #6BCB77; }
+  .char-record-badge .wrong { color: #FF6B6B; }
+
+  /* ====== 按钮组 ====== */
+  .btn-group { display: flex; gap: 14px; width: 100%; max-width: 300px; }
+  .btn {
+    flex: 1; padding: 14px 8px; border: none; border-radius: 18px;
+    font-size: 17px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center;
+    justify-content: center; gap: 5px;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btn-no {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: #fff; box-shadow: 0 6px 20px rgba(245,87,108,0.4);
+  }
+  .btn-yes {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: #fff; box-shadow: 0 6px 20px rgba(79,172,254,0.4);
+  }
+  .btn-no:hover { box-shadow: 0 8px 30px rgba(245,87,108,0.6); transform: translateY(-2px); }
+  .btn-yes:hover { box-shadow: 0 8px 30px rgba(79,172,254,0.6); transform: translateY(-2px); }
+  .btn-listen {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, #FFD93D, #FF6B6B);
+    border: none; color: #fff; font-size: 22px;
+    cursor: pointer; box-shadow: 0 6px 20px rgba(255,107,107,0.4);
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  }
+  .btn-listen:active { transform: scale(0.9); }
+
+  /* ====== 底部面板 ====== */
+  .card-box-section { margin-top: 12px; padding-bottom: 20px; }
+  .tab-bar { display: flex; gap: 8px; }
+  .tab-btn {
+    flex: 1; padding: 9px; border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 14px; background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all 0.3s; text-align: center;
+  }
+  .tab-btn.active {
+    background: rgba(255,255,255,0.9); color: #764ba2; border-color: #fff;
+  }
+  .tab-btn .tab-icon { font-size: 16px; display: block; margin-bottom: 1px; }
+  .tab-btn .tab-sub { font-size: 10px; font-weight: 400; opacity: 0.8; }
+
+  .card-box {
+    max-height: 0; overflow: hidden; transition: max-height 0.5s ease;
+    background: rgba(255,255,255,0.12); backdrop-filter: blur(10px);
+    border-radius: 16px; margin-top: 8px;
+  }
+  .card-box.open { max-height: 700px; }
+  .card-box-inner { padding: 14px; }
+  .card-box-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .card-box-header span { color: #fff; font-size: 12px; opacity: 0.8; }
+  .btn-reset {
+    background: rgba(255,100,100,0.3); border: 1px solid rgba(255,100,100,0.5);
+    color: #fff; padding: 3px 10px; border-radius: 10px;
+    font-size: 11px; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-reset:hover { background: rgba(255,100,100,0.5); }
+
+  /* ====== 会认卡片 ====== */
+  .mastered-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+  .mastered-item {
+    background: rgba(255,255,255,0.9); border-radius: 10px;
+    aspect-ratio: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    animation: bounceIn 0.4s ease; position: relative;
+    cursor: pointer; transition: transform 0.2s;
+  }
+  .mastered-item:hover { transform: scale(1.1); }
+  .mastered-item .mc { font-size: 20px; font-weight: 900; color: #333; }
+  .mastered-item .mp { font-size: 8px; color: #999; }
+  .mastered-item .star { position: absolute; top: -3px; right: -3px; font-size: 12px; }
+  .empty-box {
+    color: rgba(255,255,255,0.5); text-align: center;
+    padding: 20px; font-size: 13px;
+  }
+
+  /* ====== 识字记录列表 ====== */
+  .record-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .record-header span { color: #fff; font-size: 12px; opacity: 0.8; }
+  .record-filter { display: flex; gap: 5px; margin-bottom: 8px; }
+  .filter-btn {
+    padding: 3px 9px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
+    font-size: 11px; cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn.active {
+    background: rgba(255,255,255,0.9); color: #764ba2; border-color: #fff;
+  }
+  .record-list {
+    display: flex; flex-direction: column; gap: 5px;
+    max-height: 380px; overflow-y: auto;
+  }
+  .record-list::-webkit-scrollbar { width: 4px; }
+  .record-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+  .record-item {
+    display: flex; align-items: center; gap: 9px;
+    background: rgba(255,255,255,0.15); border-radius: 12px;
+    padding: 9px 12px; animation: slideDown 0.3s ease;
+    transition: transform 0.2s; cursor: pointer;
+  }
+  .record-item:hover { transform: scale(1.01); background: rgba(255,255,255,0.22); }
+  .record-item .ri-left { display: flex; flex-direction: column; align-items: center; min-width: 46px; }
+  .record-item .ri-char { font-size: 26px; font-weight: 900; color: #fff; line-height: 1; }
+  .record-item .ri-pinyin { font-size: 9px; color: rgba(255,255,255,0.6); }
+  .record-item .ri-mid { flex: 1; min-width: 0; }
+  .record-item .ri-hint { font-size: 10px; color: rgba(255,255,255,0.45); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ri-bar-wrap { margin-top: 3px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+  .ri-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+  .record-item .ri-right { display: flex; flex-direction: column; align-items: center; min-width: 34px; gap: 2px; }
+  .ri-badge {
+    font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 7px;
+  }
+  .ri-badge.easy { background: rgba(107,203,119,0.3); color: #6BCB77; }
+  .ri-badge.medium { background: rgba(255,217,61,0.3); color: #FFD93D; }
+  .ri-badge.hard { background: rgba(255,107,107,0.3); color: #FF6B6B; }
+  .ri-badge.mastered { background: rgba(77,150,255,0.3); color: #4D96FF; }
+  .ri-count { font-size: 10px; color: rgba(255,255,255,0.55); }
+  .ri-count strong { color: #6BCB77; font-size: 12px; }
+  .ri-count .w-strong { color: #FF6B6B; }
+  .ri-lv-badge {
+    font-size: 9px; background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.65);
+    padding: 1px 5px; border-radius: 5px;
+  }
+  .record-empty { text-align: center; color: rgba(255,255,255,0.4); padding: 24px; font-size: 13px; }
+
+  /* ====== 庆祝动画 ====== */
+  .confetti {
+    position: fixed; top: -10px; width: 11px; height: 11px;
+    border-radius: 2px; z-index: 999;
+    animation: confetti-fall linear forwards;
+  }
+  .celebration-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; background: rgba(0,0,0,0.3);
+    animation: fadeIn 0.3s ease;
+  }
+  .celebration-box {
+    background: #fff; border-radius: 28px; padding: 34px;
+    text-align: center; animation: celebrationBounce 0.6s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 290px;
+  }
+  .celebration-box .big-emoji { font-size: 65px; margin-bottom: 8px; }
+  .celebration-box h2 { color: #333; font-size: 22px; margin-bottom: 5px; }
+  .celebration-box p { color: #666; font-size: 14px; margin-bottom: 18px; }
+  .celebration-box .stats-row { display: flex; justify-content: center; gap: 18px; margin-bottom: 18px; }
+  .celebration-box .stat-item { text-align: center; }
+  .celebration-box .stat-num { font-size: 26px; font-weight: 900; color: #764ba2; }
+  .celebration-box .stat-label { font-size: 11px; color: #999; }
+  .celebration-box .btn-continue {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none; color: #fff; padding: 13px 34px;
+    border-radius: 18px; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .celebration-box .btn-continue:hover { transform: scale(1.05); }
+
+  /* ====== 星星特效 ====== */
+  .star-burst {
+    position: fixed; pointer-events: none; z-index: 99;
+    font-size: 38px;
+    animation: starBurst 0.8s ease forwards;
+  }
+
+  .tip-text {
+    color: rgba(255,255,255,0.45); text-align: center; font-size: 11px; margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-deco" id="bgDeco"></div>
+
+<div class="app">
+  <!-- 顶部 -->
+  <div class="header">
+    <h1><span>📚</span> <span id="appTitle">认字乐园</span></h1>
+    <div class="header-actions">
+      <button class="lang-toggle" id="btnLanguage" type="button">English</button>
+      <div class="stats">
+        <div class="stat-badge green">✅<span id="knowCount">0</span></div>
+        <div class="stat-badge red">❌<span id="wrongTotal">0</span></div>
+        <div class="stat-badge">⭐<span id="starCount">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 文件状态条 -->
+  <div class="file-status-bar" id="fileStatusBar">
+    <div class="file-status-dot" id="fileStatusDot"></div>
+    <div class="file-status-text" id="fileStatusText">📁 本地模式（未连接CSV文件）</div>
+    <button class="btn-file primary" id="btnOpenCsv" onclick="openCsvFile()">📂 连接CSV</button>
+    <button class="btn-file" id="btnExportCsv" onclick="saveCsvFile()">💾 保存</button>
+  </div>
+
+  <!-- 关卡 -->
+  <div class="level-bar" id="levelBar"></div>
+
+  <!-- 进度条 -->
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+
+  <!-- 模式切换 -->
+  <div class="mode-bar">
+    <button class="mode-btn active" id="modeLearn" onclick="setMode('learn')">
+      <span class="mode-icon">📖</span>
+      <span id="modeLearnText">学习模式</span>
+      <span class="mode-sub" id="modeLearnSub">学新字</span>
+    </button>
+    <button class="mode-btn" id="modeReview" onclick="setMode('review')">
+      <span class="mode-icon">🔁</span>
+      <span id="modeReviewText">复习模式</span>
+      <span class="mode-sub" id="modeReviewSub">强化易错</span>
+    </button>
+  </div>
+
+  <!-- 复习提示 -->
+  <div class="review-banner" id="reviewBanner" style="display:none">
+    <span id="reviewBannerText">🔁 复习模式：易错字优先练习</span>
+    <span id="reviewInfo"></span>
+  </div>
+
+  <!-- 卡片 -->
+  <div class="card-area">
+    <div class="char-card" id="charCard">
+      <button class="speaker" id="btnSpeaker" onclick="event.stopPropagation(); doSpeak()">🔊</button>
+      <div class="char-record-badge">
+        <span class="know">✅<span id="charKnowCount">0</span></span>
+        <span class="wrong">❌<span id="charWrongCount">0</span></span>
+      </div>
+      <div class="char-bg" id="charBg"></div>
+      <div class="pinyin" id="pinyin"></div>
+      <div class="character" id="character"></div>
+      <div class="hint" id="hint"></div>
+    </div>
+
+    <button class="btn-listen" id="btnListen" onclick="doSpeak()">🔊</button>
+
+    <div class="btn-group">
+      <button class="btn btn-no" id="btnNo">🤔 <span id="btnNoText">不认识</span></button>
+      <button class="btn btn-yes" id="btnYes">🎉 <span id="btnYesText">认识啦</span></button>
+    </div>
+  </div>
+
+  <div class="tip-text" id="tipText">点击卡片听发音，键盘 ← → 也可操作</div>
+
+  <!-- 底部面板 -->
+  <div class="card-box-section">
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tabBox" onclick="switchTab('box')">
+        <span class="tab-icon">📦</span>
+        <span id="tabBoxText">会认的字</span>
+        <span class="tab-sub" id="boxCount2">0张</span>
+      </button>
+      <button class="tab-btn" id="tabRecord" onclick="switchTab('record')">
+        <span class="tab-icon">📊</span>
+        <span id="tabRecordText">识字记录</span>
+        <span class="tab-sub" id="tabRecordSub">学习轨迹</span>
+      </button>
+    </div>
+
+    <div class="card-box open" id="boxPanel">
+      <div class="card-box-inner">
+        <div class="card-box-header">
+          <span id="masteredHeader">已经认识的字（点击听发音）：</span>
+          <button class="btn-reset" id="btnReset">🔄 <span id="btnResetText">重置</span></button>
+        </div>
+        <div id="masteredGrid" class="mastered-grid"></div>
+        <div class="empty-box" id="emptyBox">还没有认识的字哦，加油！💪</div>
+      </div>
+    </div>
+
+    <div class="card-box" id="recordPanel">
+      <div class="card-box-inner">
+        <div class="record-header">
+          <span id="recordHeader">📈 每个字的学习情况</span>
+        </div>
+        <div class="record-filter">
+          <button class="filter-btn active" data-filter="all" onclick="setFilter('all')" id="filterAll">全部</button>
+          <button class="filter-btn" data-filter="hard" onclick="setFilter('hard')" id="filterHard">🔥 易错</button>
+          <button class="filter-btn" data-filter="mastered" onclick="setFilter('mastered')" id="filterMastered">✅ 已认</button>
+          <button class="filter-btn" data-filter="new" onclick="setFilter('new')" id="filterNew">❓ 未学</button>
+        </div>
+        <div class="record-list" id="recordList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== 字库数据 ======
+const LEVELS = [
+  // ===== 第一部分：自我与身体 =====
+  {
+    name: '第一关', unlocked: true,
+    chars: [
+      { char: '人', pinyin: 'rén', hint: '一个人站立的样子', emoji: '🧑' },
+      { char: '口', pinyin: 'kǒu', hint: '张开的嘴巴', emoji: '👄' },
+      { char: '手', pinyin: 'shǒu', hint: '五个手指头', emoji: '✋' },
+      { char: '目', pinyin: 'mù', hint: '用眼睛看', emoji: '👁️' },
+      { char: '耳', pinyin: 'ěr', hint: '用耳朵听', emoji: '👂' },
+      { char: '心', pinyin: 'xīn', hint: '砰砰跳的心', emoji: '❤️' },
+      { char: '子', pinyin: 'zǐ', hint: '一个小孩子', emoji: '👶' },
+      { char: '头', pinyin: 'tóu', hint: '脑袋的头', emoji: '🗣️' },
+      { char: '脚', pinyin: 'jiǎo', hint: '用脚走路', emoji: '🦶' },
+      { char: '身', pinyin: 'shēn', hint: '身体的身体', emoji: '🧍' },
+    ]
+  },
+  {
+    name: '第二关', unlocked: false,
+    chars: [
+      { char: '爸', pinyin: 'bà', hint: '叫一声爸爸', emoji: '👨' },
+      { char: '妈', pinyin: 'mā', hint: '叫一声妈妈', emoji: '👩' },
+      { char: '爷', pinyin: 'yé', hint: '爷爷好', emoji: '👴' },
+      { char: '奶', pinyin: 'nǎi', hint: '奶奶好', emoji: '👵' },
+      { char: '哥', pinyin: 'gē', hint: '哥哥大', emoji: '🧒' },
+      { char: '姐', pinyin: 'jiě', hint: '姐姐美', emoji: '👧' },
+      { char: '弟', pinyin: 'dì', hint: '小弟弟', emoji: '👦' },
+      { char: '妹', pinyin: 'mèi', hint: '小妹妹', emoji: '👧' },
+      { char: '家', pinyin: 'jiā', hint: '温暖的家', emoji: '🏠' },
+      { char: '我', pinyin: 'wǒ', hint: '就是我自己', emoji: '🙋' },
+    ]
+  },
+  // ===== 第二部分：大自然 =====
+  {
+    name: '第三关', unlocked: false,
+    chars: [
+      { char: '日', pinyin: 'rì', hint: '红红的太阳', emoji: '☀️' },
+      { char: '月', pinyin: 'yuè', hint: '弯弯的月亮', emoji: '🌙' },
+      { char: '水', pinyin: 'shuǐ', hint: '流动的水', emoji: '💧' },
+      { char: '火', pinyin: 'huǒ', hint: '燃烧的火', emoji: '🔥' },
+      { char: '山', pinyin: 'shān', hint: '高高的山', emoji: '⛰️' },
+      { char: '石', pinyin: 'shí', hint: '硬硬的石头', emoji: '🪨' },
+      { char: '木', pinyin: 'mù', hint: '一棵大树', emoji: '🌳' },
+      { char: '土', pinyin: 'tǔ', hint: '脚下的泥土', emoji: '🌍' },
+      { char: '天', pinyin: 'tiān', hint: '蓝蓝的天空', emoji: '🌤️' },
+      { char: '地', pinyin: 'dì', hint: '我们的大地', emoji: '🏔️' },
+    ]
+  },
+  {
+    name: '第四关', unlocked: false,
+    chars: [
+      { char: '雨', pinyin: 'yǔ', hint: '天空下雨了', emoji: '🌧️' },
+      { char: '风', pinyin: 'fēng', hint: '呼呼的风', emoji: '🌬️' },
+      { char: '云', pinyin: 'yún', hint: '白白的云', emoji: '☁️' },
+      { char: '雪', pinyin: 'xuě', hint: '冬天下雪', emoji: '❄️' },
+      { char: '星', pinyin: 'xīng', hint: '天上的星星', emoji: '⭐' },
+      { char: '虹', pinyin: 'hóng', hint: '雨后彩虹', emoji: '🌈' },
+      { char: '河', pinyin: 'hé', hint: '一条小河', emoji: '🏞️' },
+      { char: '海', pinyin: 'hǎi', hint: '蓝色大海', emoji: '🌊' },
+      { char: '林', pinyin: 'lín', hint: '一片树林', emoji: '🌲' },
+      { char: '草', pinyin: 'cǎo', hint: '绿绿的小草', emoji: '🍀' },
+    ]
+  },
+  // ===== 第三部分：动物 =====
+  {
+    name: '第五关', unlocked: false,
+    chars: [
+      { char: '马', pinyin: 'mǎ', hint: '奔跑的马', emoji: '🐴' },
+      { char: '牛', pinyin: 'niú', hint: '耕田的老牛', emoji: '🐄' },
+      { char: '羊', pinyin: 'yáng', hint: '咩咩叫的羊', emoji: '🐑' },
+      { char: '鸟', pinyin: 'niǎo', hint: '天上飞的鸟', emoji: '🐦' },
+      { char: '鱼', pinyin: 'yú', hint: '水里游的鱼', emoji: '🐟' },
+      { char: '虫', pinyin: 'chóng', hint: '小虫子', emoji: '🐛' },
+      { char: '狗', pinyin: 'gǒu', hint: '忠诚的小狗', emoji: '🐕' },
+      { char: '猫', pinyin: 'māo', hint: '可爱的小猫', emoji: '🐱' },
+      { char: '鸭', pinyin: 'yā', hint: '小鸭子', emoji: '🦆' },
+      { char: '兔', pinyin: 'tù', hint: '蹦蹦跳跳的兔子', emoji: '🐰' },
+    ]
+  },
+  {
+    name: '第六关', unlocked: false,
+    chars: [
+      { char: '你', pinyin: 'nǐ', hint: '你是谁', emoji: '🫵' },
+      { char: '他', pinyin: 'tā', hint: '另外一个人', emoji: '👦' },
+      { char: '她', pinyin: 'tā', hint: '一个小女孩', emoji: '👧' },
+      { char: '一', pinyin: 'yī', hint: '数字一', emoji: '1️⃣' },
+      { char: '二', pinyin: 'èr', hint: '数字二', emoji: '2️⃣' },
+      { char: '三', pinyin: 'sān', hint: '数字三', emoji: '3️⃣' },
+      { char: '四', pinyin: 'sì', hint: '数字四', emoji: '4️⃣' },
+      { char: '五', pinyin: 'wǔ', hint: '数字五', emoji: '5️⃣' },
+      { char: '六', pinyin: 'liù', hint: '数字六', emoji: '6️⃣' },
+      { char: '七', pinyin: 'qī', hint: '数字七', emoji: '7️⃣' },
+    ]
+  },
+  {
+    name: '第七关', unlocked: false,
+    chars: [
+      { char: '八', pinyin: 'bā', hint: '数字八', emoji: '8️⃣' },
+      { char: '九', pinyin: 'jiǔ', hint: '数字九', emoji: '9️⃣' },
+      { char: '十', pinyin: 'shí', hint: '数字十', emoji: '🔟' },
+      { char: '上', pinyin: 'shàng', hint: '向上的方向', emoji: '⬆️' },
+      { char: '下', pinyin: 'xià', hint: '向下的方向', emoji: '⬇️' },
+      { char: '中', pinyin: 'zhōng', hint: '正中间', emoji: '🎯' },
+      { char: '大', pinyin: 'dà', hint: '人张开双臂', emoji: '📐' },
+      { char: '小', pinyin: 'xiǎo', hint: '比大要小', emoji: '🔹' },
+      { char: '多', pinyin: 'duō', hint: '很多很多', emoji: '📈' },
+      { char: '少', pinyin: 'shǎo', hint: '比较少', emoji: '📉' },
+    ]
+  },
+  {
+    name: '第八关', unlocked: false,
+    chars: [
+      { char: '米', pinyin: 'mǐ', hint: '一粒粒米', emoji: '🍚' },
+      { char: '饭', pinyin: 'fàn', hint: '香香的米饭', emoji: '🍚' },
+      { char: '菜', pinyin: 'cài', hint: '好吃的菜', emoji: '🥬' },
+      { char: '肉', pinyin: 'ròu', hint: '香喷喷的肉', emoji: '🥩' },
+      { char: '瓜', pinyin: 'guā', hint: '甜甜的瓜', emoji: '🍉' },
+      { char: '果', pinyin: 'guǒ', hint: '新鲜的水果', emoji: '🍎' },
+      { char: '糖', pinyin: 'táng', hint: '甜甜的糖', emoji: '🍬' },
+      { char: '茶', pinyin: 'chá', hint: '一杯茶', emoji: '🍵' },
+      { char: '衣', pinyin: 'yī', hint: '穿的衣服', emoji: '👕' },
+      { char: '裤', pinyin: 'kù', hint: '穿的裤子', emoji: '👖' },
+    ]
+  },
+  {
+    name: '第九关', unlocked: false,
+    chars: [
+      { char: '门', pinyin: 'mén', hint: '推开一扇门', emoji: '🚪' },
+      { char: '窗', pinyin: 'chuāng', hint: '明亮的窗户', emoji: '🪟' },
+      { char: '床', pinyin: 'chuáng', hint: '软软的床', emoji: '🛏️' },
+      { char: '桌', pinyin: 'zhuō', hint: '学习的桌子', emoji: '🪑' },
+      { char: '椅', pinyin: 'yǐ', hint: '坐的椅子', emoji: '🪑' },
+      { char: '灯', pinyin: 'dēng', hint: '亮亮的灯', emoji: '💡' },
+      { char: '车', pinyin: 'chē', hint: '跑跑的小车', emoji: '🚗' },
+      { char: '船', pinyin: 'chuán', hint: '在水上的船', emoji: '⛵' },
+      { char: '书', pinyin: 'shū', hint: '读一本好书', emoji: '📚' },
+      { char: '笔', pinyin: 'bǐ', hint: '写字的笔', emoji: '✏️' },
+    ]
+  },
+  {
+    name: '第十关', unlocked: false,
+    chars: [
+      { char: '纸', pinyin: 'zhǐ', hint: '一张白纸', emoji: '📄' },
+      { char: '刀', pinyin: 'dāo', hint: '切东西的刀', emoji: '🔪' },
+      { char: '文', pinyin: 'wén', hint: '学文化', emoji: '📝' },
+      { char: '字', pinyin: 'zì', hint: '认一个汉字', emoji: '🔤' },
+      { char: '色', pinyin: 'sè', hint: '漂亮的颜色', emoji: '🎨' },
+      { char: '红', pinyin: 'hóng', hint: '红色的红', emoji: '🔴' },
+      { char: '黄', pinyin: 'huáng', hint: '金黄色的黄', emoji: '🟡' },
+      { char: '绿', pinyin: 'lǜ', hint: '绿色的绿', emoji: '🟢' },
+      { char: '蓝', pinyin: 'lán', hint: '蓝色的蓝', emoji: '🔵' },
+      { char: '白', pinyin: 'bái', hint: '雪白雪白', emoji: '⚪' },
+    ]
+  },
+  {
+    name: '第十一关', unlocked: false,
+    chars: [
+      { char: '黑', pinyin: 'hēi', hint: '黑黑的夜', emoji: '⚫' },
+      { char: '好', pinyin: 'hǎo', hint: '真好真好', emoji: '👍' },
+      { char: '坏', pinyin: 'huài', hint: '做了坏事', emoji: '👎' },
+      { char: '新', pinyin: 'xīn', hint: '崭新的新', emoji: '🆕' },
+      { char: '老', pinyin: 'lǎo', hint: '年纪老了', emoji: '👴' },
+      { char: '快', pinyin: 'kuài', hint: '跑得很快', emoji: '🏃' },
+      { char: '慢', pinyin: 'màn', hint: '走得很慢', emoji: '🐢' },
+      { char: '远', pinyin: 'yuǎn', hint: '远远的山', emoji: '🏔️' },
+      { char: '低', pinyin: 'dī', hint: '低低的墙', emoji: '📐' },
+      { char: '长', pinyin: 'cháng', hint: '长长的路', emoji: '📏' },
+    ]
+  },
+  {
+    name: '第十二关', unlocked: false,
+    chars: [
+      { char: '短', pinyin: 'duǎn', hint: '短短的笔', emoji: '✏️' },
+      { char: '厚', pinyin: 'hòu', hint: '厚厚的书', emoji: '📚' },
+      { char: '薄', pinyin: 'báo', hint: '薄薄的纸', emoji: '📄' },
+      { char: '圆', pinyin: 'yuán', hint: '圆圆的球', emoji: '⚪' },
+      { char: '方', pinyin: 'fāng', hint: '方方的桌', emoji: '🟧' },
+      { char: '左', pinyin: 'zuǒ', hint: '左边的左', emoji: '⬅️' },
+      { char: '右', pinyin: 'yòu', hint: '右边的右', emoji: '➡️' },
+      { char: '前', pinyin: 'qián', hint: '前面的前', emoji: '🔜' },
+      { char: '后', pinyin: 'hòu', hint: '后面的后', emoji: '🔙' },
+      { char: '出', pinyin: 'chū', hint: '出门的出', emoji: '🚪' },
+    ]
+  },
+  {
+    name: '第十三关', unlocked: false,
+    chars: [
+      { char: '入', pinyin: 'rù', hint: '进入的入', emoji: '➡️' },
+      { char: '来', pinyin: 'lái', hint: '走过来', emoji: '👣' },
+      { char: '去', pinyin: 'qù', hint: '走过去', emoji: '🚶' },
+      { char: '开', pinyin: 'kāi', hint: '打开门', emoji: '🚪' },
+      { char: '关', pinyin: 'guān', hint: '关上门', emoji: '🚪' },
+      { char: '坐', pinyin: 'zuò', hint: '坐下来', emoji: '🪑' },
+      { char: '立', pinyin: 'lì', hint: '站起来', emoji: '🧍' },
+      { char: '走', pinyin: 'zǒu', hint: '走路', emoji: '🚶' },
+      { char: '跑', pinyin: 'pǎo', hint: '跑步', emoji: '🏃' },
+      { char: '跳', pinyin: 'tiào', hint: '跳一跳', emoji: '🦘' },
+    ]
+  },
+  {
+    name: '第十四关', unlocked: false,
+    chars: [
+      { char: '吃', pinyin: 'chī', hint: '吃饭啦', emoji: '🍽️' },
+      { char: '喝', pinyin: 'hē', hint: '喝水啦', emoji: '🥤' },
+      { char: '睡', pinyin: 'shuì', hint: '睡觉啦', emoji: '😴' },
+      { char: '看', pinyin: 'kàn', hint: '看书看', emoji: '👀' },
+      { char: '听', pinyin: 'tīng', hint: '用耳听', emoji: '👂' },
+      { char: '说', pinyin: 'shuō', hint: '说话啦', emoji: '💬' },
+      { char: '做', pinyin: 'zuò', hint: '做手工', emoji: '✂️' },
+      { char: '写', pinyin: 'xiě', hint: '写作业', emoji: '📝' },
+      { char: '画', pinyin: 'huà', hint: '画图画', emoji: '🎨' },
+      { char: '唱', pinyin: 'chàng', hint: '唱首歌', emoji: '🎤' },
+    ]
+  },
+  {
+    name: '第十五关', unlocked: false,
+    chars: [
+      { char: '玩', pinyin: 'wán', hint: '开心玩', emoji: '🎮' },
+      { char: '读', pinyin: 'dú', hint: '读书啦', emoji: '📖' },
+      { char: '问', pinyin: 'wèn', hint: '问问题', emoji: '❓' },
+      { char: '答', pinyin: 'dá', hint: '回答问题', emoji: '✅' },
+      { char: '思', pinyin: 'sī', hint: '想一想', emoji: '🤔' },
+      { char: '念', pinyin: 'niàn', hint: '念一念', emoji: '📢' },
+      { char: '哭', pinyin: 'kū', hint: '哭鼻子', emoji: '😢' },
+      { char: '笑', pinyin: 'xiào', hint: '笑嘻嘻', emoji: '😄' },
+      { char: '爱', pinyin: 'ài', hint: '我爱妈妈', emoji: '❤️' },
+      { char: '要', pinyin: 'yào', hint: '我想要', emoji: '🙋' },
+    ]
+  },
+  {
+    name: '第十六关', unlocked: false,
+    chars: [
+      { char: '会', pinyin: 'huì', hint: '会写字', emoji: '✍️' },
+      { char: '能', pinyin: 'néng', hint: '我能行', emoji: '💪' },
+      { char: '很', pinyin: 'hěn', hint: '很开心', emoji: '😊' },
+      { char: '都', pinyin: 'dōu', hint: '都来了', emoji: '👥' },
+      { char: '和', pinyin: 'hé', hint: '我和弟弟', emoji: '🤝' },
+      { char: '的', pinyin: 'de', hint: '我的书', emoji: '📕' },
+      { char: '了', pinyin: 'le', hint: '吃完了', emoji: '✅' },
+      { char: '在', pinyin: 'zài', hint: '我在家', emoji: '🏠' },
+      { char: '有', pinyin: 'yǒu', hint: '有一只猫', emoji: '🐱' },
+      { char: '没', pinyin: 'méi', hint: '没有啦', emoji: '❌' },
+    ]
+  },
+  {
+    name: '第十七关', unlocked: false,
+    chars: [
+      { char: '这', pinyin: 'zhè', hint: '这个字', emoji: '👉' },
+      { char: '那', pinyin: 'nà', hint: '那个东西', emoji: '👈' },
+      { char: '哪', pinyin: 'nǎ', hint: '在哪里', emoji: '🔍' },
+      { char: '谁', pinyin: 'shuí', hint: '你是谁', emoji: '❓' },
+      { char: '国', pinyin: 'guó', hint: '中国', emoji: '🇨🇳' },
+      { char: '明', pinyin: 'míng', hint: '明天见', emoji: '🌅' },
+      { char: '今', pinyin: 'jīn', hint: '今天', emoji: '📅' },
+      { char: '时', pinyin: 'shí', hint: '什么时候', emoji: '⏰' },
+      { char: '候', pinyin: 'hòu', hint: '时候', emoji: '⏰' },
+      { char: '早', pinyin: 'zǎo', hint: '早上好', emoji: '🌅' },
+    ]
+  },
+  {
+    name: '第十八关', unlocked: false,
+    chars: [
+      { char: '校', pinyin: 'xiào', hint: '去学校', emoji: '🏫' },
+      { char: '班', pinyin: 'bān', hint: '上哪个班', emoji: '👨‍🏫' },
+      { char: '生', pinyin: 'shēng', hint: '小学生', emoji: '🎓' },
+      { char: '师', pinyin: 'shī', hint: '老师', emoji: '👨‍🏫' },
+      { char: '友', pinyin: 'yǒu', hint: '好朋友', emoji: '🤝' },
+      { char: '真', pinyin: 'zhēn', hint: '真好啊', emoji: '✨' },
+      { char: '高', pinyin: 'gāo', hint: '高兴', emoji: '😊' },
+      { char: '兴', pinyin: 'xìng', hint: '高兴', emoji: '😊' },
+      { char: '学', pinyin: 'xué', hint: '学习', emoji: '📖' },
+      { char: '习', pinyin: 'xí', hint: '学习', emoji: '📖' },
+    ]
+  },
+  {
+    name: '第十九关', unlocked: false,
+    chars: [
+      { char: '花', pinyin: 'huā', hint: '漂亮的花', emoji: '🌸' },
+      { char: '树', pinyin: 'shù', hint: '一棵大树', emoji: '🌳' },
+      { char: '叶', pinyin: 'yè', hint: '一片叶子', emoji: '🍃' },
+      { char: '田', pinyin: 'tián', hint: '一块田', emoji: '🌾' },
+      { char: '公', pinyin: 'gōng', hint: '公共场所', emoji: '🏢' },
+      { char: '民', pinyin: 'mín', hint: '人民', emoji: '👨‍👩‍👧' },
+      { char: '主', pinyin: 'zhǔ', hint: '主人', emoji: '🧑' },
+      { char: '贝', pinyin: 'bèi', hint: '宝贝', emoji: '💎' },
+      { char: '宝', pinyin: 'bǎo', hint: '宝贝', emoji: '💎' },
+      { char: '力', pinyin: 'lì', hint: '有力气', emoji: '💪' },
+    ]
+  },
+  {
+    name: '第二十关', unlocked: false,
+    chars: [
+      { char: '东', pinyin: 'dōng', hint: '太阳东升', emoji: '🌅' },
+      { char: '西', pinyin: 'xī', hint: '太阳西落', emoji: '🌇' },
+      { char: '南', pinyin: 'nán', hint: '南方的南', emoji: '🧭' },
+      { char: '北', pinyin: 'běi', hint: '北方的北', emoji: '🧭' },
+      { char: '春', pinyin: 'chūn', hint: '春天来了', emoji: '🌸' },
+      { char: '夏', pinyin: 'xià', hint: '夏天很热', emoji: '☀️' },
+      { char: '秋', pinyin: 'qiū', hint: '秋天丰收', emoji: '🍂' },
+      { char: '冬', pinyin: 'dōng', hint: '冬天下雪', emoji: '❄️' },
+      { char: '年', pinyin: 'nián', hint: '过新年', emoji: '🎆' },
+      { char: '节', pinyin: 'jié', hint: '过节啦', emoji: '🎉' },
+    ]
+  },
+];
+
+// ====== CSV 文件名 ======
+const CSV_FILENAME = '小神童认字记录.csv';
+
+// ====== 双语文案 ======
+const translations = {
+  zh: {
+    pageTitle: '小神童认字乐园',
+    appTitle: '认字乐园',
+    languageButton: 'English',
+    openCsv: '📂 连接CSV',
+    switchCsv: '🔄 切换文件',
+    save: '💾 保存',
+    csvFileDescription: 'CSV 文件',
+    fileLocal: '📁 本地模式（未连接CSV）',
+    fileConnected: (name) => `📊 ${name}（已同步）`,
+    fileUnsaved: (name) => `⚠️ ${name}（有未保存改动）`,
+    unsupportedCsv: '你的浏览器不支持 CSV 文件同步功能，请使用 Chrome 或 Edge 浏览器！\n\n当前会使用本地存档，功能不受影响。',
+    learnMode: '学习模式',
+    learnSub: '学新字',
+    reviewMode: '复习模式',
+    reviewSub: '强化易错',
+    reviewBanner: '🔁 复习模式：易错字优先练习',
+    reviewInfo: (count) => count > 0 ? `共 ${count} 个易错字需要加强` : '全部字都很熟啦！',
+    knowButton: '认识啦',
+    dontKnowButton: '不认识',
+    tip: '点击卡片听发音，键盘 ← → 也可操作',
+    tabBox: '会认的字',
+    tabRecord: '识字记录',
+    tabRecordSub: '学习轨迹',
+    cardCount: (count) => `${count}张`,
+    masteredHeader: '已经认识的字（点击听发音）：',
+    reset: '重置',
+    emptyMastered: '还没有认识的字哦，加油！💪',
+    recordHeader: '📈 每个字的学习情况',
+    filterAll: '全部',
+    filterHard: '🔥 易错',
+    filterMastered: '✅ 已认',
+    filterNew: '❓ 未学',
+    recordEmpty: '这个分类里还没有字哦 💪',
+    levelName: (num) => `第${num}关`,
+    lockedLevel: (name) => `🔒 ${name}`,
+    unlockedAlert: (name) => `🎉 恭喜！${name} 已解锁！`,
+    celebrationTitle: '太棒了！',
+    celebrationMessage: (level, mode) => `${level}${mode === 'review' ? '复习' : '学习'}完成！`,
+    learnedChars: '已学字数',
+    totalStars: '总星星',
+    continue: '继续 ➡️',
+    difficultyEasy: '轻松',
+    difficultyMedium: '一般',
+    difficultyHard: '困难',
+    mastered: '已认',
+    levelBadge: (num) => `第${num}关`,
+    itemTitle: (know, wrong) => `认识${know}次，错误${wrong}次`,
+    resetConfirm: '确定要重置所有进度吗？学习记录也会清空哦！',
+  },
+  en: {
+    pageTitle: 'Little Prodigy Hanzi Garden',
+    appTitle: 'Hanzi Garden',
+    languageButton: '中文',
+    openCsv: '📂 Link CSV',
+    switchCsv: '🔄 Change file',
+    save: '💾 Save',
+    csvFileDescription: 'CSV file',
+    fileLocal: '📁 Local mode (CSV not linked)',
+    fileConnected: (name) => `📊 ${name} (synced)`,
+    fileUnsaved: (name) => `⚠️ ${name} (unsaved changes)`,
+    unsupportedCsv: 'Your browser does not support CSV file sync. Please use Chrome or Edge.\n\nThe app will keep using local progress, so learning still works.',
+    learnMode: 'Learn',
+    learnSub: 'New words',
+    reviewMode: 'Review',
+    reviewSub: 'Practice misses',
+    reviewBanner: '🔁 Review mode: missed words first',
+    reviewInfo: (count) => count > 0 ? `${count} tricky words need practice` : 'All words look solid!',
+    knowButton: 'I know it',
+    dontKnowButton: 'Not yet',
+    tip: 'Tap the card to hear it. Keyboard ← → also works.',
+    tabBox: 'Known words',
+    tabRecord: 'Progress',
+    tabRecordSub: 'Learning trail',
+    cardCount: (count) => `${count} cards`,
+    masteredHeader: 'Words already known (tap to hear):',
+    reset: 'Reset',
+    emptyMastered: 'No known words yet. Keep going! 💪',
+    recordHeader: '📈 Progress for each word',
+    filterAll: 'All',
+    filterHard: '🔥 Tricky',
+    filterMastered: '✅ Known',
+    filterNew: '❓ New',
+    recordEmpty: 'No words in this group yet 💪',
+    levelName: (num) => `Level ${num}`,
+    lockedLevel: (name) => `🔒 ${name}`,
+    unlockedAlert: (name) => `🎉 Great work! ${name} is unlocked!`,
+    celebrationTitle: 'Great job!',
+    celebrationMessage: (level, mode) => `${level} ${mode === 'review' ? 'review' : 'learning'} complete!`,
+    learnedChars: 'Words learned',
+    totalStars: 'Total stars',
+    continue: 'Continue ➡️',
+    difficultyEasy: 'Easy',
+    difficultyMedium: 'Review',
+    difficultyHard: 'Hard',
+    mastered: 'Known',
+    levelBadge: (num) => `L${num}`,
+    itemTitle: (know, wrong) => `Known ${know} times, missed ${wrong} times`,
+    resetConfirm: 'Reset all progress? Learning records will be cleared too.',
+  },
+};
+
+const EN_HINTS = {
+  '人': 'A person standing tall',
+  '口': 'An open mouth',
+  '手': 'A hand with five fingers',
+  '目': 'Use eyes to look',
+  '耳': 'Use ears to listen',
+  '心': 'A heart that beats',
+  '子': 'A little child',
+  '头': 'The head on your body',
+  '脚': 'Feet help us walk',
+  '身': 'Your whole body',
+  '爸': 'Say dad',
+  '妈': 'Say mom',
+  '爷': 'Grandpa says hello',
+  '奶': 'Grandma says hello',
+  '哥': 'Older brother',
+  '姐': 'Older sister',
+  '弟': 'Younger brother',
+  '妹': 'Younger sister',
+  '家': 'A warm home',
+  '我': 'This means me',
+  '日': 'The bright red sun',
+  '月': 'A curved moon',
+  '水': 'Flowing water',
+  '火': 'Burning fire',
+  '山': 'A tall mountain',
+  '石': 'A hard stone',
+  '木': 'A big tree',
+  '土': 'Soil under our feet',
+  '天': 'The blue sky',
+  '地': 'The ground beneath us',
+  '雨': 'Rain falls from the sky',
+  '风': 'Wind blowing by',
+  '云': 'A white cloud',
+  '雪': 'Snow in winter',
+  '星': 'Stars in the sky',
+  '虹': 'A rainbow after rain',
+  '河': 'A small river',
+  '海': 'The blue sea',
+  '林': 'A group of trees',
+  '草': 'Green grass',
+  '马': 'A running horse',
+  '牛': 'A hardworking ox',
+  '羊': 'A sheep that bleats',
+  '鸟': 'A bird flying in the sky',
+  '鱼': 'A fish swimming in water',
+  '虫': 'A little bug',
+  '狗': 'A loyal dog',
+  '猫': 'A cute cat',
+  '鸭': 'A little duck',
+  '兔': 'A hopping rabbit',
+  '你': 'This means you',
+  '他': 'Another person, he',
+  '她': 'A girl or woman, she',
+  '一': 'Number one',
+  '二': 'Number two',
+  '三': 'Number three',
+  '四': 'Number four',
+  '五': 'Number five',
+  '六': 'Number six',
+  '七': 'Number seven',
+  '八': 'Number eight',
+  '九': 'Number nine',
+  '十': 'Number ten',
+  '上': 'The upward direction',
+  '下': 'The downward direction',
+  '中': 'Right in the middle',
+  '大': 'Big, like arms stretched wide',
+  '小': 'Smaller than big',
+  '多': 'Many, many things',
+  '少': 'A smaller amount',
+  '米': 'Grains of rice',
+  '饭': 'Fragrant cooked rice',
+  '菜': 'Tasty vegetables or dishes',
+  '肉': 'Savory meat',
+  '瓜': 'A sweet melon',
+  '果': 'Fresh fruit',
+  '糖': 'Sweet candy',
+  '茶': 'A cup of tea',
+  '衣': 'Clothes to wear',
+  '裤': 'Pants to wear',
+  '门': 'Push open a door',
+  '窗': 'A bright window',
+  '床': 'A soft bed',
+  '桌': 'A desk for study',
+  '椅': 'A chair to sit on',
+  '灯': 'A bright lamp',
+  '车': 'A little car',
+  '船': 'A boat on water',
+  '书': 'Read a good book',
+  '笔': 'A pen for writing',
+  '纸': 'A sheet of white paper',
+  '刀': 'A knife for cutting',
+  '文': 'Learning culture and writing',
+  '字': 'A Chinese character',
+  '色': 'Beautiful colors',
+  '红': 'The color red',
+  '黄': 'Golden yellow',
+  '绿': 'The color green',
+  '蓝': 'The color blue',
+  '白': 'Snowy white',
+  '黑': 'A dark night',
+  '好': 'Very good',
+  '坏': 'Something bad',
+  '新': 'Brand new',
+  '老': 'Old in age',
+  '快': 'Run very fast',
+  '慢': 'Walk very slowly',
+  '远': 'A mountain far away',
+  '低': 'A low wall',
+  '长': 'A long road',
+  '短': 'A short pencil',
+  '厚': 'A thick book',
+  '薄': 'Thin paper',
+  '圆': 'A round ball',
+  '方': 'A square table',
+  '左': 'The left side',
+  '右': 'The right side',
+  '前': 'The front side',
+  '后': 'The back side',
+  '出': 'Go out the door',
+  '入': 'Enter inside',
+  '来': 'Come over here',
+  '去': 'Go over there',
+  '开': 'Open the door',
+  '关': 'Close the door',
+  '坐': 'Sit down',
+  '立': 'Stand up',
+  '走': 'Walk',
+  '跑': 'Run',
+  '跳': 'Jump',
+  '吃': 'Eat a meal',
+  '喝': 'Drink water',
+  '睡': 'Go to sleep',
+  '看': 'Look or read',
+  '听': 'Listen with ears',
+  '说': 'Speak',
+  '做': 'Make or do something',
+  '写': 'Write homework',
+  '画': 'Draw a picture',
+  '唱': 'Sing a song',
+  '玩': 'Play happily',
+  '读': 'Read a book',
+  '问': 'Ask a question',
+  '答': 'Answer a question',
+  '思': 'Think about it',
+  '念': 'Read aloud',
+  '哭': 'Cry',
+  '笑': 'Smile and laugh',
+  '爱': 'I love mom',
+  '要': 'I want it',
+  '会': 'Know how to write',
+  '能': 'I can do it',
+  '很': 'Very happy',
+  '都': 'Everyone is here',
+  '和': 'Me and my younger brother',
+  '的': 'My book',
+  '了': 'Finished eating',
+  '在': 'I am at home',
+  '有': 'There is a cat',
+  '没': 'Not have',
+  '这': 'This word',
+  '那': 'That thing',
+  '哪': 'Where is it',
+  '谁': 'Who are you',
+  '国': 'China, a country',
+  '明': 'See you tomorrow',
+  '今': 'Today',
+  '时': 'What time',
+  '候': 'A time or moment',
+  '早': 'Good morning',
+  '校': 'Go to school',
+  '班': 'Which class',
+  '生': 'A student',
+  '师': 'Teacher',
+  '友': 'Good friend',
+  '真': 'Really nice',
+  '高': 'Happy',
+  '兴': 'Happy',
+  '学': 'Study and learn',
+  '习': 'Practice and learn',
+  '花': 'A beautiful flower',
+  '树': 'A big tree',
+  '叶': 'A leaf',
+  '田': 'A field',
+  '公': 'A public place',
+  '民': 'The people',
+  '主': 'The owner',
+  '贝': 'A treasure',
+  '宝': 'A precious treasure',
+  '力': 'Have strength',
+  '东': 'The sun rises in the east',
+  '西': 'The sun sets in the west',
+  '南': 'The south direction',
+  '北': 'The north direction',
+  '春': 'Spring is coming',
+  '夏': 'Summer is hot',
+  '秋': 'Autumn harvest',
+  '冬': 'Snow in winter',
+  '年': 'Celebrate the new year',
+  '节': 'Celebrate a festival',
+};
+
+// ====== 状态 ======
+let state = {
+  currentLevel: 0,
+  currentCharIndex: 0,
+  mastered: {},    // { "人": true, ... }
+  stars: 0,
+  currentQueue: [],
+  // 每个字的记录: { "人": { know: 3, wrong: 1, lastTime: 1234567 }, ... }
+  records: {},
+  currentMode: 'learn',
+  currentFilter: 'all',
+  currentTab: 'box',
+  currentLanguage: 'zh',
+};
+
+// ====== CSV 文件状态 ======
+let csvState = {
+  handle: null,       // FileSystemFileHandle
+  isConnected: false, // 是否已连接CSV
+  isDirty: false,     // 是否有未保存的改动
+  fileName: '',
+  status: 'local',
+};
+
+function t(key, ...args) {
+  const langPack = translations[state.currentLanguage] || translations.zh;
+  const value = langPack[key] ?? translations.zh[key] ?? '';
+  return typeof value === 'function' ? value(...args) : value;
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function levelName(index) {
+  return t('levelName', index + 1);
+}
+
+function charHint(data) {
+  return state.currentLanguage === 'en' ? (EN_HINTS[data.char] || data.hint) : data.hint;
+}
+
+function applyI18n() {
+  document.documentElement.lang = state.currentLanguage === 'en' ? 'en' : 'zh-CN';
+  document.title = t('pageTitle');
+  setText('appTitle', t('appTitle'));
+  setText('btnLanguage', t('languageButton'));
+  setText('btnExportCsv', t('save'));
+  setText('modeLearnText', t('learnMode'));
+  setText('modeLearnSub', t('learnSub'));
+  setText('modeReviewText', t('reviewMode'));
+  setText('modeReviewSub', t('reviewSub'));
+  setText('reviewBannerText', t('reviewBanner'));
+  setText('btnNoText', t('dontKnowButton'));
+  setText('btnYesText', t('knowButton'));
+  setText('tipText', t('tip'));
+  setText('tabBoxText', t('tabBox'));
+  setText('tabRecordText', t('tabRecord'));
+  setText('tabRecordSub', t('tabRecordSub'));
+  setText('masteredHeader', t('masteredHeader'));
+  setText('btnResetText', t('reset'));
+  setText('emptyBox', t('emptyMastered'));
+  setText('recordHeader', t('recordHeader'));
+  setText('filterAll', t('filterAll'));
+  setText('filterHard', t('filterHard'));
+  setText('filterMastered', t('filterMastered'));
+  setText('filterNew', t('filterNew'));
+  if (state.currentMode === 'review') {
+    const hardCount = state.currentQueue.filter(c => (c.wrongCount || getRecord(c.char).wrong) >= 2).length;
+    setText('reviewInfo', t('reviewInfo', hardCount));
+  }
+  updateFileStatusUI(csvState.status);
+  const current = state.currentQueue[state.currentCharIndex];
+  if (current) {
+    document.getElementById('hint').textContent = charHint(current) + ' ' + current.emoji;
+  }
+  updateUI();
+}
+
+function switchLanguage() {
+  state.currentLanguage = state.currentLanguage === 'zh' ? 'en' : 'zh';
+  try { localStorage.setItem('charGameLanguage', state.currentLanguage); } catch(e) {}
+  saveState();
+  applyI18n();
+}
+
+// ====== IndexedDB 存储句柄 ======
+const DB_NAME = 'charGameDB';
+const STORE_NAME = 'handles';
+const HANDLE_KEY = 'csvFileHandle';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onerror = reject;
+    req.onsuccess = () => resolve(req.result);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+  });
+}
+
+async function saveHandle(handle) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).put(handle, HANDLE_KEY);
+    tx.oncomplete = resolve;
+    tx.onerror = reject;
+  });
+}
+
+async function loadHandle() {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const req = tx.objectStore(STORE_NAME).get(HANDLE_KEY);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = reject;
+    });
+  } catch(e) { return null; }
+}
+
+async function clearHandle() {
+  try {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).delete(HANDLE_KEY);
+      tx.oncomplete = resolve;
+      tx.onerror = reject;
+    });
+  } catch(e) {}
+}
+
+// ====== CSV 读取 & 解析 ======
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return {};
+  const result = {};
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split(',');
+    if (parts.length < 4) continue;
+    const char = parts[0].trim();
+    const know = parseInt(parts[2]) || 0;
+    const wrong = parseInt(parts[3]) || 0;
+    result[char] = { know, wrong, lastTime: Date.now() };
+  }
+  return result;
+}
+
+// ====== CSV 生成 ======
+function generateCSV() {
+  const allChars = LEVELS.flatMap(l => l.chars);
+  const lines = ['字,拼音,认识次数,错误次数,状态,难度,第几关'];
+  allChars.forEach(c => {
+    const rec = state.records[c.char] || { know: 0, wrong: 0 };
+    const level = LEVELS.findIndex(lv => lv.chars.some(ch => ch.char === c.char)) + 1;
+    const isMastered = !!state.mastered[c.char];
+    const status = isMastered ? '已认' : (rec.know > 0 ? '学习中' : '未学');
+    const err = rec.wrong >= 3 ? '困难' : rec.wrong >= 1 ? '一般' : '轻松';
+    lines.push(`${c.char},${c.pinyin},${rec.know},${rec.wrong},${status},${err},第${level}关`);
+  });
+  return '﻿' + lines.join('\n');
+}
+
+// ====== 打开 CSV 文件 ======
+async function openCsvFile() {
+  // 不支持 File System Access API
+  if (!('showOpenFilePicker' in window)) {
+    alert(t('unsupportedCsv'));
+    return;
+  }
+
+  try {
+    const handles = await window.showOpenFilePicker({
+      types: [{ description: t('csvFileDescription'), accept: { 'text/csv': ['.csv'] } }],
+      multiple: false,
+    });
+    const handle = handles[0];
+    csvState.handle = handle;
+    csvState.fileName = handle.name;
+    csvState.isConnected = true;
+    csvState.isDirty = false;
+
+    // 保存句柄到 IndexedDB
+    await saveHandle(handle);
+
+    // 读取文件内容
+    const file = await handle.getFile();
+    const text = await file.text();
+    const csvRecords = parseCSV(text);
+
+    // 合并：CSV 有就用CSV的，本地没有的字也要加进来
+    Object.keys(csvRecords).forEach(ch => {
+      if (!state.records[ch]) {
+        state.records[ch] = csvRecords[ch];
+      } else {
+        // 本地记录比CSV多就用本地的
+        if (state.records[ch].know > csvRecords[ch].know) {
+          csvRecords[ch].know = state.records[ch].know;
+        }
+        if (state.records[ch].wrong > csvRecords[ch].wrong) {
+          csvRecords[ch].wrong = state.records[ch].wrong;
+        }
+        state.records[ch] = csvRecords[ch];
+      }
+      if (csvRecords[ch].know > 0 && csvRecords[ch].wrong === 0) {
+        // CSV里认识的字自动标记会认
+        state.mastered[ch] = true;
+      }
+    });
+
+    updateFileStatusUI('connected');
+    updateUI();
+    playSound('correct');
+
+  } catch(e) {
+    if (e.name !== 'AbortError') {
+      console.error('打开文件失败:', e);
+      updateFileStatusUI('local');
+    }
+  }
+}
+
+// ====== 自动恢复上次文件 ======
+async function autoReconnectLastFile() {
+  if (!('showOpenFilePicker' in window)) return;
+
+  try {
+    const handle = await loadHandle();
+    if (!handle) { updateFileStatusUI('local'); return; }
+
+    // 检查是否还能用（可能文件被删了或移动了）
+    try {
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm === 'granted') {
+        csvState.handle = handle;
+        csvState.fileName = handle.name;
+        csvState.isConnected = true;
+
+        const file = await handle.getFile();
+        const text = await file.text();
+        const csvRecords = parseCSV(text);
+
+        Object.keys(csvRecords).forEach(ch => {
+          if (!state.records[ch]) {
+            state.records[ch] = csvRecords[ch];
+          } else {
+            if (state.records[ch].know > csvRecords[ch].know) {
+              csvRecords[ch].know = state.records[ch].know;
+            }
+            if (state.records[ch].wrong > csvRecords[ch].wrong) {
+              csvRecords[ch].wrong = state.records[ch].wrong;
+            }
+            state.records[ch] = csvRecords[ch];
+          }
+          if (csvRecords[ch].know > 0 && csvRecords[ch].wrong === 0) {
+            state.mastered[ch] = true;
+          }
+        });
+
+        updateFileStatusUI('connected');
+        updateUI();
+        return;
+      }
+    } catch(e) {
+      // 句柄失效，清理
+      await clearHandle();
+    }
+
+    updateFileStatusUI('local');
+  } catch(e) {
+    updateFileStatusUI('local');
+  }
+}
+
+// ====== 写入 CSV ======
+async function syncToCsv() {
+  if (!csvState.isConnected || !csvState.handle) return;
+  try {
+    const writable = await csvState.handle.createWritable();
+    await writable.write(generateCSV());
+    await writable.close();
+    csvState.isDirty = false;
+    updateFileStatusUI('connected');
+  } catch(e) {
+    console.error('写入CSV失败:', e);
+    csvState.isDirty = true;
+    updateFileStatusUI('unsaved');
+  }
+}
+
+// ====== 手动保存 ======
+async function saveCsvFile() {
+  if (!('showOpenFilePicker' in window)) {
+    // 不支持API时，用传统方式下载
+    const blob = new Blob([generateCSV()], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = CSV_FILENAME;
+    a.click();
+    URL.revokeObjectURL(url);
+    playSound('correct');
+    return;
+  }
+
+  if (csvState.isConnected && csvState.handle) {
+    await syncToCsv();
+    playSound('correct');
+  } else {
+    // 还没连上，直接另存为
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: CSV_FILENAME,
+        types: [{ description: t('csvFileDescription'), accept: { 'text/csv': ['.csv'] } }],
+      });
+      csvState.handle = handle;
+      csvState.fileName = handle.name;
+      csvState.isConnected = true;
+      await saveHandle(handle);
+      await syncToCsv();
+      updateFileStatusUI('connected');
+      playSound('correct');
+    } catch(e) {
+      if (e.name !== 'AbortError') console.error('保存失败:', e);
+    }
+  }
+}
+
+// ====== 文件状态 UI ======
+function updateFileStatusUI(status) {
+  csvState.status = status || 'local';
+  const dot = document.getElementById('fileStatusDot');
+  const text = document.getElementById('fileStatusText');
+  const btnOpen = document.getElementById('btnOpenCsv');
+
+  dot.className = 'file-status-dot';
+
+  if (status === 'connected') {
+    dot.classList.add('connected');
+    text.textContent = t('fileConnected', csvState.fileName);
+    btnOpen.textContent = t('switchCsv');
+    btnOpen.classList.remove('primary');
+  } else if (status === 'unsaved') {
+    dot.classList.add('unsaved');
+    text.textContent = t('fileUnsaved', csvState.fileName);
+    btnOpen.textContent = t('openCsv');
+    btnOpen.classList.add('primary');
+  } else {
+    dot.classList.add('local');
+    text.textContent = t('fileLocal');
+    btnOpen.textContent = t('openCsv');
+    btnOpen.classList.add('primary');
+  }
+}
+
+// ====== 每次操作后自动同步 ======
+function markDirty() {
+  csvState.isDirty = true;
+  if (csvState.isConnected) updateFileStatusUI('unsaved');
+  // 自动延迟保存（防抖）
+  clearTimeout(window._syncTimer);
+  window._syncTimer = setTimeout(() => {
+    if (csvState.isConnected) syncToCsv();
+  }, 2000);
+}
+
+// ====== 本地存储 ======
+function loadState() {
+  try {
+    const savedLanguage = localStorage.getItem('charGameLanguage');
+    if (savedLanguage === 'zh' || savedLanguage === 'en') state.currentLanguage = savedLanguage;
+    const saved = localStorage.getItem('charGame2');
+    if (saved) {
+      const s = JSON.parse(saved);
+      state.mastered = s.mastered || {};
+      state.stars = s.stars || 0;
+      state.records = s.records || {};
+      if (!savedLanguage && (s.currentLanguage === 'zh' || s.currentLanguage === 'en')) {
+        state.currentLanguage = s.currentLanguage;
+      }
+      LEVELS.forEach((lv, i) => {
+        if (i === 0) return;
+        const prevChars = LEVELS[i-1].chars;
+        const allMastered = prevChars.every(c => state.mastered[c.char]);
+        if (allMastered) lv.unlocked = true;
+      });
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('charGame2', JSON.stringify({
+      mastered: state.mastered,
+      stars: state.stars,
+      records: state.records,
+      currentLanguage: state.currentLanguage,
+    }));
+  } catch(e) {}
+}
+
+function getRecord(char) {
+  if (!state.records[char]) {
+    state.records[char] = { know: 0, wrong: 0, lastTime: 0 };
+  }
+  return state.records[char];
+}
+
+// ====== 语音 ======
+function doSpeak(charOverride) {
+  const data = state.currentQueue[state.currentCharIndex];
+  const char = charOverride || (data && data.char);
+  if (!char) return;
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(char);
+  u.lang = 'zh-CN'; u.rate = 0.7; u.pitch = 1.2;
+  const voices = window.speechSynthesis.getVoices();
+  const zhVoice = voices.find(v => v.lang.includes('zh') && v.name.includes('female'))
+    || voices.find(v => v.lang.includes('zh-CN'))
+    || voices.find(v => v.lang.includes('zh'));
+  if (zhVoice) u.voice = zhVoice;
+  window.speechSynthesis.speak(u);
+}
+
+// ====== 音效 ======
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    if (type === 'correct') {
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+      osc.start(); osc.stop(ctx.currentTime + 0.5);
+    } else if (type === 'wrong') {
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.setValueAtTime(200, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start(); osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'click') {
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      osc.start(); osc.stop(ctx.currentTime + 0.1);
+    }
+  } catch(e) {}
+}
+
+// ====== 特效 ======
+function spawnConfetti(count = 30) {
+  const colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#9B59B6', '#FF6B9D'];
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    el.style.animationDuration = (2 + Math.random() * 2) + 's';
+    el.style.animationDelay = Math.random() * 0.5 + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+}
+
+function spawnStars(x, y, count = 6) {
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'star-burst';
+    el.textContent = '⭐';
+    el.style.left = (x + (Math.random()-0.5)*60) + 'px';
+    el.style.top = (y + (Math.random()-0.5)*60) + 'px';
+    el.style.animationDelay = (Math.random()*0.3) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+}
+
+// ====== 模式 & 标签切换 ======
+function setMode(mode) {
+  playSound('click');
+  state.currentMode = mode;
+  document.getElementById('modeLearn').classList.toggle('active', mode === 'learn');
+  document.getElementById('modeReview').classList.toggle('active', mode === 'review');
+  document.getElementById('reviewBanner').style.display = mode === 'review' ? 'block' : 'none';
+  buildQueue();
+  nextChar();
+  updateUI();
+}
+
+function switchTab(tab) {
+  playSound('click');
+  state.currentTab = tab;
+  document.getElementById('tabBox').classList.toggle('active', tab === 'box');
+  document.getElementById('tabRecord').classList.toggle('active', tab === 'record');
+  if (tab === 'box') {
+    document.getElementById('boxPanel').classList.add('open');
+    document.getElementById('recordPanel').classList.remove('open');
+  } else {
+    document.getElementById('boxPanel').classList.remove('open');
+    document.getElementById('recordPanel').classList.add('open');
+    renderRecordList();
+  }
+}
+
+function setFilter(filter) {
+  state.currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  renderRecordList();
+}
+
+// ====== 构建队列 ======
+function buildQueue() {
+  const lv = LEVELS[state.currentLevel];
+
+  if (state.currentMode === 'review') {
+    const charsWithWrong = lv.chars.map(c => {
+      const rec = getRecord(c.char);
+      return { ...c, wrongCount: rec.wrong, knowCount: rec.know };
+    });
+    charsWithWrong.sort((a, b) => {
+      if (b.wrongCount !== a.wrongCount) return b.wrongCount - a.wrongCount;
+      return a.knowCount - b.knowCount;
+    });
+    state.currentQueue = charsWithWrong;
+    const hardChars = charsWithWrong.filter(c => c.wrongCount >= 2);
+    document.getElementById('reviewInfo').textContent = t('reviewInfo', hardChars.length);
+  } else {
+    const unmastered = lv.chars.filter(c => !state.mastered[c.char]);
+    const mastered = lv.chars.filter(c => state.mastered[c.char]);
+    state.currentQueue = [...shuffle(unmastered), ...shuffle(mastered)];
+  }
+  state.currentCharIndex = 0;
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function showChar(data) {
+  document.getElementById('pinyin').textContent = data.pinyin;
+  document.getElementById('character').textContent = data.char;
+  document.getElementById('hint').textContent = charHint(data) + ' ' + data.emoji;
+  document.getElementById('charBg').textContent = data.char;
+
+  const rec = getRecord(data.char);
+  document.getElementById('charKnowCount').textContent = rec.know;
+  document.getElementById('charWrongCount').textContent = rec.wrong;
+
+  const card = document.getElementById('charCard');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'bounceIn 0.5s ease, rainbowBorder 4s linear infinite';
+
+  setTimeout(() => doSpeak(), 300);
+}
+
+function nextChar() {
+  if (state.currentQueue.length === 0) { showCelebration(); return; }
+  if (state.currentCharIndex >= state.currentQueue.length) state.currentCharIndex = 0;
+  showChar(state.currentQueue[state.currentCharIndex]);
+}
+
+// ====== 认识啦 ======
+function handleKnow() {
+  const data = state.currentQueue[state.currentCharIndex];
+  if (!data) return;
+
+  const rec = getRecord(data.char);
+  rec.know++;
+  rec.lastTime = Date.now();
+
+  if (!state.mastered[data.char]) {
+    state.mastered[data.char] = true;
+    state.stars++;
+    playSound('correct');
+    state.currentQueue.splice(state.currentCharIndex, 1);
+
+    const card = document.getElementById('charCard');
+    const rect = card.getBoundingClientRect();
+    spawnConfetti(15);
+    spawnStars(rect.left + rect.width/2, rect.top + rect.height/2, 8);
+    checkLevelUnlock();
+  } else {
+    playSound('click');
+    state.currentQueue.splice(state.currentCharIndex, 1);
+  }
+
+  saveState();
+  markDirty();
+  updateUI();
+  nextChar();
+}
+
+// ====== 不认识 ======
+function handleDontKnow() {
+  const data = state.currentQueue[state.currentCharIndex];
+  if (!data) return;
+
+  const rec = getRecord(data.char);
+  rec.wrong++;
+  rec.lastTime = Date.now();
+  playSound('wrong');
+
+  const item = state.currentQueue.splice(state.currentCharIndex, 1)[0];
+  const insertPos = state.currentCharIndex + Math.floor(Math.random() * 3) + 1;
+  state.currentQueue.splice(Math.min(insertPos, state.currentQueue.length), 0, item);
+
+  const card = document.getElementById('charCard');
+  card.style.animation = 'shake 0.4s ease';
+  setTimeout(() => card.style.animation = 'bounceIn 0.5s ease, rainbowBorder 4s linear infinite', 400);
+  setTimeout(() => doSpeak(), 500);
+
+  saveState();
+  markDirty();
+  updateUI();
+  nextChar();
+}
+
+// ====== 检查关卡解锁 ======
+function checkLevelUnlock() {
+  LEVELS.forEach((lv, i) => {
+    if (i === 0 || lv.unlocked) return;
+    const prevChars = LEVELS[i-1].chars;
+    const allMastered = prevChars.every(c => state.mastered[c.char]);
+    if (allMastered) {
+      lv.unlocked = true;
+      setTimeout(() => { spawnConfetti(50); alert(t('unlockedAlert', levelName(i))); }, 500);
+    }
+  });
+}
+
+// ====== 庆祝 ======
+function showCelebration() {
+  const lv = LEVELS[state.currentLevel];
+  const masteredInLv = lv.chars.filter(c => state.mastered[c.char]).length;
+  spawnConfetti(60);
+  const overlay = document.createElement('div');
+  overlay.className = 'celebration-overlay';
+  overlay.innerHTML = `
+    <div class="celebration-box">
+      <div class="big-emoji">🏆</div>
+      <h2>${t('celebrationTitle')}</h2>
+      <p>${t('celebrationMessage', levelName(state.currentLevel), state.currentMode)}</p>
+      <div class="stats-row">
+        <div class="stat-item"><div class="stat-num">${masteredInLv}</div><div class="stat-label">${t('learnedChars')}</div></div>
+        <div class="stat-item"><div class="stat-num">⭐${state.stars}</div><div class="stat-label">${t('totalStars')}</div></div>
+      </div>
+      <button class="btn-continue" id="btnContinue">${t('continue')}</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById('btnContinue').onclick = () => {
+    overlay.remove();
+    if (state.currentMode === 'learn' && state.currentLevel < LEVELS.length - 1 && LEVELS[state.currentLevel + 1].unlocked) {
+      state.currentLevel++;
+    }
+    buildQueue();
+    nextChar();
+    updateUI();
+  };
+}
+
+// ====== 识字记录渲染 ======
+function renderRecordList() {
+  const list = document.getElementById('recordList');
+  const allChars = LEVELS.flatMap(l => l.chars);
+  const filter = state.currentFilter;
+
+  let items = allChars.map(c => ({
+    ...c,
+    rec: getRecord(c.char),
+    isMastered: !!state.mastered[c.char],
+    level: LEVELS.findIndex(lv => lv.chars.some(ch => ch.char === c.char)) + 1,
+  }));
+
+  if (filter === 'hard') {
+    items = items.filter(it => it.rec.wrong >= 2);
+    items.sort((a, b) => b.rec.wrong - a.rec.wrong);
+  } else if (filter === 'mastered') {
+    items = items.filter(it => it.isMastered);
+    items.sort((a, b) => b.rec.know - a.rec.know);
+  } else if (filter === 'new') {
+    items = items.filter(it => !it.isMastered && it.rec.know === 0 && it.rec.wrong === 0);
+  }
+
+  if (items.length === 0) {
+    list.innerHTML = `<div class="record-empty">${t('recordEmpty')}</div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(it => {
+    const { rec, isMastered, level, char, pinyin, hint } = it;
+    const total = rec.know + rec.wrong;
+    const knowPct = total > 0 ? (rec.know / total * 100) : 50;
+    let badgeClass = 'easy', badgeText = t('difficultyEasy');
+    if (rec.wrong >= 3) { badgeClass = 'hard'; badgeText = t('difficultyHard'); }
+    else if (rec.wrong >= 1) { badgeClass = 'medium'; badgeText = t('difficultyMedium'); }
+    if (isMastered && rec.wrong < 3) { badgeClass = 'mastered'; badgeText = t('mastered'); }
+    const barColor = rec.wrong >= 3 ? '#FF6B6B' : rec.wrong >= 1 ? '#FFD93D' : '#6BCB77';
+
+    return `<div class="record-item" onclick="doSpeak('${char}')">
+      <div class="ri-left">
+        <div class="ri-char">${char}</div>
+        <div class="ri-pinyin">${pinyin}</div>
+      </div>
+      <div class="ri-mid">
+        <div class="ri-hint">${charHint(it)}</div>
+        <div class="ri-bar-wrap"><div class="ri-bar-fill" style="width:${knowPct}%;background:${barColor}"></div></div>
+      </div>
+      <div class="ri-right">
+        <span class="ri-badge ${badgeClass}">${badgeText}</span>
+        <div class="ri-count"><strong>${rec.know}</strong>/<span class="w-strong">${rec.wrong}</span></div>
+        <span class="ri-lv-badge">${t('levelBadge', level)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ====== UI 更新 ======
+function updateUI() {
+  const masteredCount = Object.keys(state.mastered).length;
+  const totalWrong = Object.values(state.records).reduce((s, r) => s + (r.wrong || 0), 0);
+
+  document.getElementById('starCount').textContent = state.stars;
+  document.getElementById('knowCount').textContent = masteredCount;
+  document.getElementById('wrongTotal').textContent = totalWrong;
+  document.getElementById('boxCount2').textContent = t('cardCount', masteredCount);
+
+  renderLevels();
+
+  const lv = LEVELS[state.currentLevel];
+  const masteredInLv = lv.chars.filter(c => state.mastered[c.char]).length;
+  const pct = (masteredInLv / lv.chars.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  renderMasteredGrid();
+}
+
+function renderLevels() {
+  const bar = document.getElementById('levelBar');
+  bar.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'level-btn' + (i === state.currentLevel ? ' active' : '') + (!lv.unlocked ? ' lock' : '');
+    const name = levelName(i);
+    btn.textContent = lv.unlocked ? name : t('lockedLevel', name);
+    btn.onclick = () => {
+      if (!lv.unlocked) return;
+      playSound('click');
+      state.currentLevel = i;
+      buildQueue();
+      nextChar();
+      updateUI();
+    };
+    bar.appendChild(btn);
+  });
+}
+
+function renderMasteredGrid() {
+  const grid = document.getElementById('masteredGrid');
+  const empty = document.getElementById('emptyBox');
+  const keys = Object.keys(state.mastered);
+  if (keys.length === 0) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+  grid.innerHTML = '';
+  const allChars = LEVELS.flatMap(l => l.chars);
+  keys.forEach(ch => {
+    const info = allChars.find(c => c.char === ch);
+    if (!info) return;
+    const item = document.createElement('div');
+    item.className = 'mastered-item';
+    item.innerHTML = `<div class="star">⭐</div><div class="mp">${info.pinyin}</div><div class="mc">${info.char}</div>`;
+    item.onclick = (e) => { doSpeak(ch); spawnStars(e.clientX, e.clientY, 3); };
+    const rec = getRecord(ch);
+    item.title = t('itemTitle', rec.know, rec.wrong);
+    grid.appendChild(item);
+  });
+}
+
+// ====== 初始化 ======
+function init() {
+  loadState();
+
+  // 背景装饰
+  const decos = ['🌟', '⭐', '🌈', '🎈', '🎵', '🌸', '🦋', '🍭', '📚', '🎨', '🐱', '🐰'];
+  const bgDeco = document.getElementById('bgDeco');
+  for (let i = 0; i < 20; i++) {
+    const span = document.createElement('span');
+    span.textContent = decos[i % decos.length];
+    span.style.left = Math.random() * 100 + '%';
+    span.style.top = Math.random() * 100 + '%';
+    span.style.animationDelay = (Math.random() * 5) + 's';
+    span.style.fontSize = (18 + Math.random() * 18) + 'px';
+    bgDeco.appendChild(span);
+  }
+
+  // 语音预加载
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  }
+
+  // 按钮事件
+  document.getElementById('btnLanguage').onclick = switchLanguage;
+  document.getElementById('btnYes').onclick = handleKnow;
+  document.getElementById('btnNo').onclick = handleDontKnow;
+  document.getElementById('charCard').onclick = doSpeak;
+
+  document.getElementById('btnReset').onclick = () => {
+    if (confirm(t('resetConfirm'))) {
+      state.mastered = {};
+      state.stars = 0;
+      state.records = {};
+      saveState();
+      markDirty();
+      LEVELS.forEach((lv, i) => lv.unlocked = i === 0);
+      buildQueue();
+      nextChar();
+      updateUI();
+    }
+  };
+
+  // 键盘快捷键
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); handleKnow(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); handleDontKnow(); }
+  });
+
+  // 先显示本地模式，然后尝试自动恢复上次CSV
+  updateFileStatusUI('local');
+  autoReconnectLastFile();
+
+  buildQueue();
+  nextChar();
+  updateUI();
+  applyI18n();
+}
+
+init();
+</script>
+</body>
+</html>
