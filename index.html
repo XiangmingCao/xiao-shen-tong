@@ -58,6 +58,14 @@
     50% { box-shadow: 0 0 15px rgba(255,217,61,0.9); }
   }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes petWiggle {
+    0%, 100% { transform: rotate(-2deg) translateY(0); }
+    50% { transform: rotate(3deg) translateY(-4px); }
+  }
+  @keyframes petGlow {
+    0%, 100% { filter: drop-shadow(0 12px 18px rgba(46, 125, 50, 0.24)); }
+    50% { filter: drop-shadow(0 18px 28px rgba(255, 146, 43, 0.34)); }
+  }
 
   body {
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -94,6 +102,21 @@
   }
   .header h1 span { font-size: 26px; }
   .header-actions { display: flex; align-items: center; gap: 8px; }
+  .user-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px; padding: 4px 6px 4px 9px; color: #fff;
+    font-size: 11px; font-weight: 800; max-width: 130px;
+  }
+  .user-chip[hidden] { display: none; }
+  .user-chip span {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .user-chip button {
+    border: none; border-radius: 999px; background: rgba(255,255,255,0.9);
+    color: #764ba2; padding: 3px 7px; font-size: 10px; font-weight: 900;
+    cursor: pointer; flex-shrink: 0;
+  }
   .lang-toggle {
     background: rgba(255,255,255,0.9); color: #764ba2;
     border: 1px solid rgba(255,255,255,0.95); border-radius: 16px;
@@ -109,6 +132,50 @@
   }
   .stat-badge.green { background: rgba(107,203,119,0.3); }
   .stat-badge.red { background: rgba(255,107,107,0.3); }
+
+  /* ====== 登录注册 ====== */
+  .auth-screen {
+    position: fixed; inset: 0; z-index: 200;
+    display: grid; place-items: center; padding: 18px;
+    background: linear-gradient(135deg, rgba(102,126,234,0.96), rgba(118,75,162,0.96));
+  }
+  .auth-screen[hidden] { display: none; }
+  .auth-card {
+    width: min(100%, 360px); background: rgba(255,255,255,0.96);
+    border-radius: 22px; padding: 24px; color: #2e2a4a;
+    box-shadow: 0 24px 70px rgba(25, 15, 58, 0.36);
+  }
+  .auth-top {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+  }
+  .auth-logo { font-size: 36px; line-height: 1; }
+  .auth-card h2 { font-size: 22px; margin: 0 0 4px; }
+  .auth-card p { color: #69627c; font-size: 13px; line-height: 1.45; margin-bottom: 16px; }
+  .auth-tabs {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    background: #f1edff; border-radius: 14px; padding: 5px; margin-bottom: 14px;
+  }
+  .auth-tab {
+    border: none; border-radius: 10px; background: transparent; color: #655a7c;
+    padding: 8px; font-size: 13px; font-weight: 900; cursor: pointer;
+  }
+  .auth-tab.active { background: #fff; color: #764ba2; box-shadow: 0 6px 16px rgba(76,57,120,0.12); }
+  .auth-form { display: grid; gap: 10px; }
+  .auth-form input {
+    width: 100%; border: 1px solid #ddd6f3; border-radius: 14px;
+    padding: 12px 13px; font-size: 15px; outline: none;
+  }
+  .auth-form input:focus { border-color: #764ba2; box-shadow: 0 0 0 3px rgba(118,75,162,0.12); }
+  .auth-submit {
+    border: none; border-radius: 16px; padding: 12px 16px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff; font-size: 15px; font-weight: 900; cursor: pointer;
+  }
+  .auth-message {
+    min-height: 18px; color: #FF6B6B; font-size: 12px; font-weight: 800;
+    text-align: center; margin-top: 2px;
+  }
 
   /* ====== 文件状态条 ====== */
   .file-status-bar {
@@ -138,6 +205,87 @@
     background: rgba(107,203,119,0.4); border-color: rgba(107,203,119,0.6);
   }
   .btn-file.primary:hover { background: rgba(107,203,119,0.6); }
+
+  /* ====== 成长宠物 ====== */
+  .pet-panel {
+    display: grid; grid-template-columns: 126px minmax(0, 1fr); gap: 14px;
+    align-items: center; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, rgba(255,249,214,0.98), rgba(218,255,232,0.96) 50%, rgba(225,239,255,0.96));
+    border: 2px solid rgba(255,217,61,0.92); border-radius: 20px;
+    padding: 14px; margin: 8px 0 12px;
+    box-shadow: 0 18px 38px rgba(31, 18, 77, 0.22);
+  }
+  .pet-panel::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+    background: linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF);
+  }
+  .pet-visual {
+    min-height: 132px; display: grid; place-items: center; position: relative;
+  }
+  .pet-avatar-img {
+    width: 118px; height: 118px; object-fit: contain;
+    animation: petWiggle 3.8s ease-in-out infinite, petGlow 3s ease-in-out infinite;
+  }
+  .pet-avatar-fallback {
+    width: 112px; height: 112px; border-radius: 24px;
+    background: linear-gradient(135deg, #FFF3B0, #A8E6CF);
+    display: grid; place-items: center; font-size: 62px;
+    box-shadow: 0 12px 26px rgba(0,0,0,0.14);
+    animation: petWiggle 3s ease-in-out infinite;
+  }
+  .pet-avatar-img[hidden],
+  .pet-avatar-fallback[hidden] { display: none !important; }
+  .pet-stage-badge {
+    position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+    color: #2e2a4a; background: rgba(255,255,255,0.95);
+    border: 1px solid rgba(255,217,61,0.85); border-radius: 999px;
+    padding: 4px 10px; font-size: 12px; font-weight: 900;
+    box-shadow: 0 7px 16px rgba(64, 43, 86, 0.12);
+  }
+  .pet-info { min-width: 0; }
+  .pet-title-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 8px; margin-bottom: 5px;
+  }
+  .pet-name { color: #2e2a4a; font-size: 17px; font-weight: 900; }
+  .pet-level {
+    flex-shrink: 0; color: #fff; background: linear-gradient(135deg, #FF8A3D, #FF5E78);
+    border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 900;
+  }
+  .pet-skill {
+    color: #4a4560; font-size: 13px; line-height: 1.4;
+    font-weight: 800;
+  }
+  .pet-progress {
+    height: 6px; border-radius: 999px; overflow: hidden;
+    background: rgba(65, 54, 91, 0.14); margin-top: 8px;
+  }
+  .pet-progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #6BCB77, #FFD93D, #FF8A3D);
+    transition: width 0.5s ease;
+  }
+  .pet-progress-text {
+    color: #6a637a; font-size: 11px; font-weight: 800;
+    margin-top: 5px;
+  }
+  .pet-skill-list {
+    display: flex; gap: 6px; overflow-x: auto; padding-top: 9px;
+  }
+  .pet-skill-chip {
+    flex: 0 0 auto; border-radius: 999px; padding: 3px 7px;
+    background: rgba(255,255,255,0.78); color: #4d4663;
+    border: 1px solid rgba(118,75,162,0.12);
+    font-size: 10px; font-weight: 800;
+  }
+  @media (max-width: 380px) {
+    .pet-panel { grid-template-columns: 104px minmax(0, 1fr); gap: 10px; padding: 12px; }
+    .pet-visual { min-height: 114px; }
+    .pet-avatar-img { width: 100px; height: 100px; }
+    .pet-avatar-fallback { width: 96px; height: 96px; font-size: 54px; }
+    .pet-name { font-size: 15px; }
+    .pet-skill { font-size: 12px; }
+  }
 
   /* ====== 关卡 ====== */
   .level-bar {
@@ -256,6 +404,25 @@
     font-size: 13px; color: #999; margin-top: 6px;
     position: relative; z-index: 1;
   }
+  .char-card .word-toggle {
+    margin-top: 10px; padding: 6px 14px; border-radius: 999px;
+    border: 1px solid #FFD93D; background: #FFF7D6; color: #6b4f00;
+    font-size: 12px; font-weight: 900; cursor: pointer;
+    position: relative; z-index: 1; transition: transform 0.2s, background 0.2s;
+  }
+  .char-card .word-toggle:active { transform: scale(0.96); }
+  .char-card .word-toggle[aria-expanded="true"] { background: #FFE89A; }
+  .char-card .word-panel {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+    max-width: 214px; margin-top: 8px; position: relative; z-index: 1;
+  }
+  .char-card .word-panel[hidden] { display: none; }
+  .char-card .word-chip {
+    border: 1px solid rgba(118,75,162,0.14); border-radius: 999px;
+    background: #f6f2ff; color: #4c3f6d; padding: 5px 10px;
+    font-size: 13px; font-weight: 800; cursor: pointer;
+  }
+  .char-card .word-chip:active { transform: scale(0.96); }
   .char-card .speaker {
     position: absolute; top: 12px; right: 12px;
     width: 36px; height: 36px; border-radius: 50%;
@@ -430,6 +597,18 @@
   .celebration-box .stat-item { text-align: center; }
   .celebration-box .stat-num { font-size: 26px; font-weight: 900; color: #764ba2; }
   .celebration-box .stat-label { font-size: 11px; color: #999; }
+  .pet-unlock {
+    background: linear-gradient(135deg, #fff7d6, #e3fff2);
+    border: 2px solid #FFD93D; border-radius: 18px;
+    padding: 12px; margin-bottom: 16px; text-align: left;
+  }
+  .pet-unlock-top { display: flex; align-items: center; gap: 10px; }
+  .pet-unlock-avatar {
+    width: 50px; height: 50px; object-fit: contain; flex-shrink: 0;
+    filter: drop-shadow(0 8px 12px rgba(0,0,0,0.16));
+  }
+  .pet-unlock h3 { margin: 0; color: #333; font-size: 15px; }
+  .pet-unlock p { margin: 4px 0 0; color: #666; font-size: 12px; line-height: 1.4; }
   .celebration-box .btn-continue {
     background: linear-gradient(135deg, #667eea, #764ba2);
     border: none; color: #fff; padding: 13px 34px;
@@ -454,11 +633,38 @@
 
 <div class="bg-deco" id="bgDeco"></div>
 
+<div class="auth-screen" id="authScreen" hidden>
+  <div class="auth-card">
+    <div class="auth-top">
+      <div>
+        <div class="auth-logo">📚</div>
+        <h2 id="authTitle">小朋友登录</h2>
+      </div>
+      <button class="lang-toggle" id="btnAuthLanguage" type="button">English</button>
+    </div>
+    <p id="authSubtitle">每个小朋友用自己的名字进入，学习进度会分开保存。</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="authLoginTab" type="button">登录</button>
+      <button class="auth-tab" id="authRegisterTab" type="button">注册</button>
+    </div>
+    <div class="auth-form">
+      <input id="authUsername" type="text" autocomplete="username" maxlength="24" placeholder="用户名">
+      <input id="authPassword" type="password" autocomplete="current-password" maxlength="32" placeholder="密码">
+      <button class="auth-submit" id="btnAuthSubmit" type="button">登录</button>
+      <div class="auth-message" id="authMessage"></div>
+    </div>
+  </div>
+</div>
+
 <div class="app">
   <!-- 顶部 -->
   <div class="header">
     <h1><span>📚</span> <span id="appTitle">认字乐园</span></h1>
     <div class="header-actions">
+      <div class="user-chip" id="userChip" hidden>
+        <span id="currentUserName"></span>
+        <button id="btnLogout" type="button">退出</button>
+      </div>
       <button class="lang-toggle" id="btnLanguage" type="button">English</button>
       <div class="stats">
         <div class="stat-badge green">✅<span id="knowCount">0</span></div>
@@ -467,6 +673,25 @@
       </div>
     </div>
   </div>
+
+  <!-- 成长宠物 -->
+  <section class="pet-panel" id="petPanel" aria-live="polite">
+    <div class="pet-visual">
+      <img class="pet-avatar-img" id="petAvatarImg" src="zp/小宠物_Lv1_婴儿期.png" alt="识字小伙伴 Lv.1">
+      <div class="pet-avatar-fallback" id="petAvatarFallback" hidden>🐣</div>
+      <div class="pet-stage-badge" id="petStageBadge">Lv.1</div>
+    </div>
+    <div class="pet-info">
+      <div class="pet-title-row">
+        <div class="pet-name" id="petName">识字小伙伴</div>
+        <div class="pet-level" id="petLevel">Lv.1</div>
+      </div>
+      <div class="pet-skill" id="petSkill">陪你一起读第一个字</div>
+      <div class="pet-progress"><div class="pet-progress-fill" id="petProgressFill"></div></div>
+      <div class="pet-progress-text" id="petProgressText">已完成 0/20 关</div>
+      <div class="pet-skill-list" id="petSkillList"></div>
+    </div>
+  </section>
 
   <!-- 文件状态条 -->
   <div class="file-status-bar" id="fileStatusBar">
@@ -516,6 +741,8 @@
       <div class="pinyin" id="pinyin"></div>
       <div class="character" id="character"></div>
       <div class="hint" id="hint"></div>
+      <button class="word-toggle" id="btnWords" type="button" aria-expanded="false">组词</button>
+      <div class="word-panel" id="wordPanel" hidden></div>
     </div>
 
     <button class="btn-listen" id="btnListen" onclick="doSpeak()">🔊</button>
@@ -881,6 +1108,10 @@ const LEVELS = [
 
 // ====== CSV 文件名 ======
 const CSV_FILENAME = '小神童认字记录.csv';
+const AUTH_TOKEN_KEY = 'charGameAuthToken';
+const AUTH_CURRENT_USER_KEY = 'charGameCurrentUser';
+const AUTH_USER_STATE_PREFIX = 'charGame2:user:';
+const AUTH_SERVER_MIGRATED_KEY = 'charGameServerMigrated';
 
 // ====== 双语文案 ======
 const translations = {
@@ -888,6 +1119,20 @@ const translations = {
     pageTitle: '小神童认字乐园',
     appTitle: '认字乐园',
     languageButton: 'English',
+    authTitle: '小朋友登录',
+    authSubtitle: '每个小朋友用自己的名字进入，学习进度会分开保存。',
+    authLoginTab: '登录',
+    authRegisterTab: '注册',
+    authUsernamePlaceholder: '用户名',
+    authPasswordPlaceholder: '密码',
+    authLoginButton: '登录',
+    authRegisterButton: '注册',
+    authLogout: '退出',
+    authEmpty: '请输入用户名和密码',
+    authUserExists: '这个用户名已经注册啦',
+    authUserNotFound: '没有这个用户，请先注册',
+    authWrongPassword: '密码不对，请再试一次',
+    authRegisterSuccess: '注册成功，开始学习！',
     openCsv: '📂 连接CSV',
     switchCsv: '🔄 切换文件',
     save: '💾 保存',
@@ -904,6 +1149,8 @@ const translations = {
     reviewInfo: (count) => count > 0 ? `共 ${count} 个易错字需要加强` : '全部字都很熟啦！',
     knowButton: '认识啦',
     dontKnowButton: '不认识',
+    groupWords: '组词',
+    hideWords: '收起',
     tip: '点击卡片听发音，键盘 ← → 也可操作',
     tabBox: '会认的字',
     tabRecord: '识字记录',
@@ -926,6 +1173,13 @@ const translations = {
     learnedChars: '已学字数',
     totalStars: '总星星',
     continue: '继续 ➡️',
+    petName: '识字小伙伴',
+    petLevel: (level) => `Lv.${level}`,
+    petProgress: (done, total) => `已完成 ${done}/${total} 关`,
+    petImageAlt: (level) => `识字小伙伴 Lv.${level}`,
+    petSkillUnlockedTitle: (level) => `宠物升到 Lv.${level}！`,
+    petSkillUnlockedBody: (skill) => `新技能：${skill}`,
+    petNoSkill: '陪你一起读第一个字',
     difficultyEasy: '轻松',
     difficultyMedium: '一般',
     difficultyHard: '困难',
@@ -938,6 +1192,20 @@ const translations = {
     pageTitle: 'Little Prodigy Hanzi Garden',
     appTitle: 'Hanzi Garden',
     languageButton: '中文',
+    authTitle: 'Kid Login',
+    authSubtitle: 'Each child signs in with a name, and progress stays separate.',
+    authLoginTab: 'Login',
+    authRegisterTab: 'Register',
+    authUsernamePlaceholder: 'Username',
+    authPasswordPlaceholder: 'Password',
+    authLoginButton: 'Login',
+    authRegisterButton: 'Register',
+    authLogout: 'Logout',
+    authEmpty: 'Enter a username and password',
+    authUserExists: 'That username is already registered',
+    authUserNotFound: 'No user found. Please register first.',
+    authWrongPassword: 'Wrong password. Try again.',
+    authRegisterSuccess: 'Registered. Ready to learn!',
     openCsv: '📂 Link CSV',
     switchCsv: '🔄 Change file',
     save: '💾 Save',
@@ -954,6 +1222,8 @@ const translations = {
     reviewInfo: (count) => count > 0 ? `${count} tricky words need practice` : 'All words look solid!',
     knowButton: 'I know it',
     dontKnowButton: 'Not yet',
+    groupWords: 'Words',
+    hideWords: 'Hide',
     tip: 'Tap the card to hear it. Keyboard ← → also works.',
     tabBox: 'Known words',
     tabRecord: 'Progress',
@@ -976,6 +1246,13 @@ const translations = {
     learnedChars: 'Words learned',
     totalStars: 'Total stars',
     continue: 'Continue ➡️',
+    petName: 'Reading Buddy',
+    petLevel: (level) => `Lv.${level}`,
+    petProgress: (done, total) => `${done}/${total} levels complete`,
+    petImageAlt: (level) => `Reading Buddy Lv.${level}`,
+    petSkillUnlockedTitle: (level) => `Buddy reached Lv.${level}!`,
+    petSkillUnlockedBody: (skill) => `New skill: ${skill}`,
+    petNoSkill: 'Reads the first word with you',
     difficultyEasy: 'Easy',
     difficultyMedium: 'Review',
     difficultyHard: 'Hard',
@@ -1189,6 +1466,109 @@ const EN_HINTS = {
   '节': 'Celebrate a festival',
 };
 
+const WORD_GROUPS = Object.fromEntries([
+  ['人', '大人', '人们', '好人'], ['口', '人口', '门口', '开口'], ['手', '小手', '洗手', '手心'], ['目', '目光', '题目', '目录'],
+  ['耳', '耳朵', '木耳', '耳机'], ['心', '开心', '爱心', '小心'], ['子', '孩子', '儿子', '子女'], ['头', '头发', '头顶', '点头'],
+  ['脚', '脚步', '小脚', '洗脚'], ['身', '身体', '全身', '身边'], ['爸', '爸爸', '爸妈', '老爸'], ['妈', '妈妈', '爸妈', '老妈'],
+  ['爷', '爷爷', '大爷', '爷孙'], ['奶', '奶奶', '牛奶', '奶茶'], ['哥', '哥哥', '大哥', '哥俩'], ['姐', '姐姐', '大姐', '姐妹'],
+  ['弟', '弟弟', '兄弟', '小弟'], ['妹', '妹妹', '姐妹', '小妹'], ['家', '家人', '回家', '大家'], ['我', '我们', '我的', '自我'],
+  ['日', '日出', '生日', '日月'], ['月', '月亮', '月光', '月牙'], ['水', '水果', '喝水', '河水'], ['火', '火车', '火山', '大火'],
+  ['山', '山上', '高山', '山水'], ['石', '石头', '石子', '山石'], ['木', '木头', '木马', '树木'], ['土', '土地', '泥土', '土豆'],
+  ['天', '天空', '今天', '天气'], ['地', '大地', '地上', '土地'], ['雨', '下雨', '雨水', '雨伞'], ['风', '大风', '风车', '风雨'],
+  ['云', '白云', '云朵', '风云'], ['雪', '下雪', '雪花', '雪人'], ['星', '星星', '星光', '星空'], ['虹', '彩虹', '虹桥', '雨虹'],
+  ['河', '小河', '河水', '河边'], ['海', '大海', '海水', '海边'], ['林', '树林', '林子', '森林'], ['草', '小草', '草地', '青草'],
+  ['马', '小马', '马车', '木马'], ['牛', '小牛', '牛奶', '水牛'], ['羊', '小羊', '山羊', '羊毛'], ['鸟', '小鸟', '飞鸟', '鸟儿'],
+  ['鱼', '小鱼', '鱼肉', '金鱼'], ['虫', '小虫', '虫子', '昆虫'], ['狗', '小狗', '狗狗', '花狗'], ['猫', '小猫', '猫咪', '花猫'],
+  ['鸭', '小鸭', '鸭子', '鸭蛋'], ['兔', '小兔', '兔子', '白兔'], ['你', '你好', '你们', '你的'], ['他', '他们', '他的', '他家'],
+  ['她', '她们', '她的', '她家'], ['一', '一个', '一天', '一起'], ['二', '二月', '二十', '二手'], ['三', '三个', '三天', '三月'],
+  ['四', '四个', '四方', '四季'], ['五', '五个', '五月', '五星'], ['六', '六个', '六月', '六岁'], ['七', '七个', '七月', '七色'],
+  ['八', '八个', '八月', '八方'], ['九', '九个', '九月', '九天'], ['十', '十个', '十月', '十分'], ['上', '上学', '上面', '早上'],
+  ['下', '下雨', '下面', '下午'], ['中', '中国', '中间', '中心'], ['大', '大人', '大家', '大小'], ['小', '小手', '小鸟', '小心'],
+  ['多', '多少', '很多', '多云'], ['少', '多少', '很少', '少年'], ['米', '大米', '米饭', '小米'], ['饭', '米饭', '吃饭', '早饭'],
+  ['菜', '青菜', '菜园', '饭菜'], ['肉', '牛肉', '肉片', '肉包'], ['瓜', '西瓜', '南瓜', '瓜果'], ['果', '水果', '果园', '苹果'],
+  ['糖', '白糖', '糖果', '冰糖'], ['茶', '茶水', '奶茶', '喝茶'], ['衣', '衣服', '上衣', '雨衣'], ['裤', '裤子', '长裤', '短裤'],
+  ['门', '大门', '门口', '开门'], ['窗', '窗户', '窗口', '窗外'], ['床', '小床', '床上', '起床'], ['桌', '桌子', '书桌', '桌面'],
+  ['椅', '椅子', '桌椅', '木椅'], ['灯', '台灯', '电灯', '灯光'], ['车', '汽车', '火车', '车门'], ['船', '小船', '船上', '轮船'],
+  ['书', '书包', '看书', '读书'], ['笔', '铅笔', '毛笔', '笔画'], ['纸', '白纸', '纸张', '纸条'], ['刀', '小刀', '刀子', '剪刀'],
+  ['文', '文化', '文明', '文字'], ['字', '汉字', '写字', '认字'], ['色', '颜色', '红色', '彩色'], ['红', '红花', '红色', '火红'],
+  ['黄', '黄色', '黄瓜', '金黄'], ['绿', '绿色', '绿叶', '草绿'], ['蓝', '蓝天', '蓝色', '海蓝'], ['白', '白云', '白色', '雪白'],
+  ['黑', '黑夜', '黑色', '黑板'], ['好', '好人', '你好', '好看'], ['坏', '坏人', '坏事', '坏了'], ['新', '新年', '新书', '新衣'],
+  ['老', '老师', '老人', '老家'], ['快', '快乐', '快车', '飞快'], ['慢', '慢走', '慢慢', '很慢'], ['远', '远方', '远处', '很远'],
+  ['低', '低头', '低声', '高低'], ['长', '长大', '长江', '很长'], ['短', '短裤', '短发', '长短'], ['厚', '厚书', '厚衣', '很厚'],
+  ['薄', '薄纸', '薄片', '很薄'], ['圆', '圆形', '圆月', '圆圈'], ['方', '方向', '方块', '东方'], ['左', '左手', '左边', '左右'],
+  ['右', '右手', '右边', '左右'], ['前', '前面', '前方', '以前'], ['后', '后面', '后来', '以后'], ['出', '出门', '出来', '日出'],
+  ['入', '入口', '进入', '出入'], ['来', '来了', '过来', '未来'], ['去', '去年', '回去', '出去'], ['开', '开门', '开心', '开学'],
+  ['关', '关门', '关心', '开关'], ['坐', '坐下', '坐车', '坐好'], ['立', '立正', '站立', '立刻'], ['走', '走路', '走开', '行走'],
+  ['跑', '跑步', '快跑', '跑开'], ['跳', '跳高', '跳舞', '跳远'], ['吃', '吃饭', '吃菜', '好吃'], ['喝', '喝水', '喝茶', '好喝'],
+  ['睡', '睡觉', '睡前', '睡着'], ['看', '看书', '看见', '好看'], ['听', '听话', '听见', '好听'], ['说', '说话', '小说', '说明'],
+  ['做', '做饭', '做事', '做好'], ['写', '写字', '写作', '书写'], ['画', '画画', '图画', '画笔'], ['唱', '唱歌', '合唱', '唱片'],
+  ['玩', '玩具', '玩水', '好玩'], ['读', '读书', '朗读', '阅读'], ['问', '问题', '提问', '问好'], ['答', '回答', '答案', '问答'],
+  ['思', '思考', '思念', '心思'], ['念', '思念', '念书', '想念'], ['哭', '哭声', '哭了', '爱哭'], ['笑', '笑声', '微笑', '大笑'],
+  ['爱', '爱心', '可爱', '爱护'], ['要', '要求', '想要', '需要'], ['会', '开会', '学会', '会写'], ['能', '能力', '可能', '能干'],
+  ['很', '很好', '很多', '很快'], ['都', '都是', '都有', '都来'], ['和', '和好', '和平', '我和'], ['的', '我的', '好的', '你的'],
+  ['了', '好了', '来了', '走了'], ['在', '现在', '在家', '在这'], ['有', '有用', '有时', '有人'], ['没', '没有', '没事', '没来'],
+  ['这', '这个', '这里', '这样'], ['那', '那个', '那里', '那样'], ['哪', '哪个', '哪里', '哪边'], ['谁', '谁的', '是谁', '谁来'],
+  ['国', '中国', '国家', '国旗'], ['明', '明天', '明亮', '文明'], ['今', '今天', '今年', '如今'], ['时', '时间', '小时', '有时'],
+  ['候', '时候', '等候', '气候'], ['早', '早上', '早饭', '早安'], ['校', '学校', '校门', '校园'], ['班', '班级', '上班', '班长'],
+  ['生', '学生', '生日', '生活'], ['师', '老师', '师生', '师父'], ['友', '朋友', '友好', '好友'], ['真', '真好', '认真', '真心'],
+  ['高', '高兴', '高山', '高大'], ['兴', '高兴', '兴趣', '兴奋'], ['学', '学习', '学校', '学生'], ['习', '学习', '习惯', '复习'],
+  ['花', '花朵', '红花', '开花'], ['树', '大树', '树叶', '树林'], ['叶', '叶子', '树叶', '绿叶'], ['田', '田地', '水田', '田野'],
+  ['公', '公园', '公共', '公主'], ['民', '人民', '民主', '公民'], ['主', '主人', '公主', '主要'], ['贝', '宝贝', '贝壳', '贝母'],
+  ['宝', '宝贝', '宝石', '宝宝'], ['力', '力气', '努力', '能力'], ['东', '东方', '东西', '东边'], ['西', '西方', '西瓜', '东西'],
+  ['南', '南方', '南瓜', '江南'], ['北', '北方', '北京', '东北'], ['春', '春天', '春风', '春节'], ['夏', '夏天', '夏日', '立夏'],
+  ['秋', '秋天', '秋风', '中秋'], ['冬', '冬天', '冬雪', '立冬'], ['年', '新年', '今年', '少年'], ['节', '节日', '春节', '过节'],
+].map(([char, ...words]) => [char, words]));
+
+const PET_SKILLS = [
+  { level: 1, emoji: '🐣', zh: '陪你一起读第一个字', en: 'Reads the first word with you' },
+  { level: 2, emoji: '🐥', zh: '答对时开心跳一跳', en: 'Does a happy hop after correct answers' },
+  { level: 3, emoji: '🦊', zh: '发现易错字并提醒复习', en: 'Finds tricky words for review' },
+  { level: 4, emoji: '🦊', zh: '给每关加油打气', en: 'Cheers for every level' },
+  { level: 5, emoji: '🦊', zh: '点亮彩虹学习光环', en: 'Lights up a rainbow study glow' },
+  { level: 6, emoji: '🐯', zh: '复习时优先守住错字', en: 'Guards missed words in review' },
+  { level: 7, emoji: '🐯', zh: '帮你记住拼音节奏', en: 'Helps remember pinyin rhythm' },
+  { level: 8, emoji: '🐯', zh: '收集星星能量', en: 'Collects star power' },
+  { level: 9, emoji: '🦁', zh: '开启专注护盾', en: 'Turns on a focus shield' },
+  { level: 10, emoji: '🦁', zh: '生成今日复习小目标', en: 'Creates a small review goal' },
+  { level: 11, emoji: '🦁', zh: '听写前帮你热身', en: 'Warms up before dictation' },
+  { level: 12, emoji: '🐲', zh: '错字变少时放烟花', en: 'Fires confetti when mistakes drop' },
+  { level: 13, emoji: '🐲', zh: '提醒慢慢读、看清楚', en: 'Reminds you to read slowly' },
+  { level: 14, emoji: '🐲', zh: '给难字贴上记忆标签', en: 'Adds memory tags to hard words' },
+  { level: 15, emoji: '🦄', zh: '解锁闪亮外观', en: 'Unlocks a shiny look' },
+  { level: 16, emoji: '🦄', zh: '陪你完成整组复习', en: 'Stays through a full review set' },
+  { level: 17, emoji: '🦄', zh: '给新关卡送祝福', en: 'Blesses every new level' },
+  { level: 18, emoji: '🧙', zh: '把错字变成记忆魔法', en: 'Turns missed words into memory magic' },
+  { level: 19, emoji: '🧙', zh: '守护连续学习', en: 'Protects steady learning' },
+  { level: 20, emoji: '🧙', zh: '解锁大师陪练', en: 'Unlocks master practice mode' },
+  { level: 21, emoji: '🌟', zh: '完成全部关卡，成为识字冠军伙伴', en: 'Becomes a champion reading buddy' },
+];
+
+const PET_IMAGES = {
+  1: 'zp/小宠物_Lv1_婴儿期.png',
+  2: 'zp/小宠物_Lv2_婴儿期.png',
+  3: 'zp/小宠物_Lv3_婴儿期.png',
+  4: 'zp/小宠物_Lv4_婴儿期.png',
+  5: 'zp/小宠物_Lv5_婴儿期.png',
+  6: 'zp/小宠物_Lv6_幼年期.png',
+  7: 'zp/小宠物_Lv7_幼年期.png',
+  8: 'zp/小宠物_Lv8_幼年期.png',
+  9: 'zp/小宠物_Lv9_幼年期.png',
+  10: 'zp/小宠物_Lv10_幼年期.png',
+  11: 'zp/小宠物_Lv11_成长期.png',
+  12: 'zp/小宠物_Lv12_成长期.png',
+  13: 'zp/小宠物_Lv13_成长期.png',
+  14: 'zp/小宠物_Lv14_成长期.png',
+  15: 'zp/小宠物_Lv15_成长期.png',
+  16: 'zp/小宠物_Lv16_成熟期.png',
+  17: 'zp/小宠物_Lv17_成熟期.png',
+  18: 'zp/小宠物_Lv18_成熟期.png',
+  19: 'zp/小宠物_Lv19_成熟期.png',
+  20: 'zp/小宠物_Lv20_最终形态.png',
+};
+
+const PET_LEVELS_PER_IMAGE = 2;
+const PET_MAX_IMAGE_LEVEL = 20;
+
 // ====== 状态 ======
 let state = {
   currentLevel: 0,
@@ -1202,7 +1582,13 @@ let state = {
   currentFilter: 'all',
   currentTab: 'box',
   currentLanguage: 'zh',
+  petLevel: 1,
+  petClaimedLevels: {},
 };
+
+let wordPanelVisible = false;
+let authMode = 'login';
+let currentUser = '';
 
 // ====== CSV 文件状态 ======
 let csvState = {
@@ -1212,6 +1598,16 @@ let csvState = {
   fileName: '',
   status: 'local',
 };
+
+function resetCsvState() {
+  csvState = {
+    handle: null,
+    isConnected: false,
+    isDirty: false,
+    fileName: '',
+    status: 'local',
+  };
+}
 
 function t(key, ...args) {
   const langPack = translations[state.currentLanguage] || translations.zh;
@@ -1232,11 +1628,132 @@ function charHint(data) {
   return state.currentLanguage === 'en' ? (EN_HINTS[data.char] || data.hint) : data.hint;
 }
 
+function wordGroupForChar(char) {
+  return WORD_GROUPS[char] || [`${char}字`, `${char}词`, `学${char}`];
+}
+
+function renderWordPanel(data) {
+  const btn = document.getElementById('btnWords');
+  const panel = document.getElementById('wordPanel');
+  if (!btn || !panel) return;
+
+  btn.textContent = wordPanelVisible ? t('hideWords') : t('groupWords');
+  btn.setAttribute('aria-expanded', wordPanelVisible ? 'true' : 'false');
+  panel.hidden = !wordPanelVisible;
+  panel.innerHTML = '';
+
+  if (!wordPanelVisible || !data) return;
+  wordGroupForChar(data.char).forEach(word => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'word-chip';
+    chip.textContent = word;
+    chip.onclick = (event) => {
+      event.stopPropagation();
+      doSpeak(word);
+    };
+    panel.appendChild(chip);
+  });
+}
+
+function toggleWordPanel() {
+  wordPanelVisible = !wordPanelVisible;
+  renderWordPanel(state.currentQueue[state.currentCharIndex]);
+  playSound('click');
+}
+
+function completedLevelNumbers() {
+  return LEVELS
+    .map((lv, i) => lv.chars.every(c => state.mastered[c.char]) ? i + 1 : null)
+    .filter(Boolean);
+}
+
+function getPetSkill(level = state.petLevel) {
+  const cappedLevel = Math.max(1, Math.min(level, PET_SKILLS[PET_SKILLS.length - 1].level));
+  return [...PET_SKILLS].reverse().find(skill => skill.level <= cappedLevel) || PET_SKILLS[0];
+}
+
+function petImageForLevel(level = state.petLevel) {
+  const cappedLevel = Math.max(1, Math.min(Number(level) || 1, PET_MAX_IMAGE_LEVEL));
+  return PET_IMAGES[cappedLevel] || PET_IMAGES[1];
+}
+
+function petLevelFromCompletedCount(completedCount) {
+  const level = Math.floor(Math.max(0, completedCount) / PET_LEVELS_PER_IMAGE) + 1;
+  return Math.max(1, Math.min(level, PET_MAX_IMAGE_LEVEL));
+}
+
+function getUnlockedPetSkills() {
+  return PET_SKILLS.filter(skill => skill.level <= state.petLevel);
+}
+
+function petSkillText(skill) {
+  return state.currentLanguage === 'en' ? skill.en : skill.zh;
+}
+
+function syncPetFromProgress(showUnlock = false, completedLevelNumber = null) {
+  const completed = completedLevelNumbers();
+  if (!state.petClaimedLevels || typeof state.petClaimedLevels !== 'object') {
+    state.petClaimedLevels = {};
+  }
+
+  const previousPetLevel = state.petLevel || 1;
+  if (!completedLevelNumber) {
+    completed.forEach(level => { state.petClaimedLevels[level] = true; });
+  } else if (!state.petClaimedLevels[completedLevelNumber]) {
+    state.petClaimedLevels[completedLevelNumber] = true;
+  }
+
+  const claimedCount = Object.keys(state.petClaimedLevels).length;
+  state.petLevel = petLevelFromCompletedCount(claimedCount);
+  const unlockedSkill = state.petLevel > previousPetLevel ? getPetSkill(state.petLevel) : null;
+  return showUnlock ? unlockedSkill : null;
+}
+
+function renderPetPanel() {
+  const skill = getPetSkill();
+  const completedCount = completedLevelNumbers().length;
+  const pct = Math.min(100, (completedCount / LEVELS.length) * 100);
+  const level = state.petLevel || 1;
+  const image = document.getElementById('petAvatarImg');
+  const fallback = document.getElementById('petAvatarFallback');
+  if (image) {
+    image.onerror = () => {
+      image.hidden = true;
+      if (fallback) fallback.hidden = false;
+    };
+    image.onload = () => {
+      image.hidden = false;
+      if (fallback) fallback.hidden = true;
+    };
+    image.src = petImageForLevel(level);
+    image.alt = t('petImageAlt', Math.min(level, PET_MAX_IMAGE_LEVEL));
+  }
+  if (fallback) fallback.textContent = skill.emoji;
+  setText('petName', t('petName'));
+  setText('petLevel', t('petLevel', level));
+  setText('petStageBadge', t('petLevel', Math.min(level, PET_MAX_IMAGE_LEVEL)));
+  setText('petSkill', petSkillText(skill || PET_SKILLS[0]));
+  const fill = document.getElementById('petProgressFill');
+  if (fill) fill.style.width = pct + '%';
+  setText('petProgressText', t('petProgress', completedCount, LEVELS.length));
+  const list = document.getElementById('petSkillList');
+  if (list) {
+    list.innerHTML = getUnlockedPetSkills()
+      .slice(-4)
+      .map(item => `<span class="pet-skill-chip">${item.emoji} ${petSkillText(item)}</span>`)
+      .join('');
+    list.title = t('petProgress', completedCount, LEVELS.length);
+  }
+}
+
 function applyI18n() {
   document.documentElement.lang = state.currentLanguage === 'en' ? 'en' : 'zh-CN';
   document.title = t('pageTitle');
   setText('appTitle', t('appTitle'));
   setText('btnLanguage', t('languageButton'));
+  renderAuthUI();
+  updateUserUI();
   setText('btnExportCsv', t('save'));
   setText('modeLearnText', t('learnMode'));
   setText('modeLearnSub', t('learnSub'));
@@ -1257,6 +1774,7 @@ function applyI18n() {
   setText('filterHard', t('filterHard'));
   setText('filterMastered', t('filterMastered'));
   setText('filterNew', t('filterNew'));
+  renderPetPanel();
   if (state.currentMode === 'review') {
     const hardCount = state.currentQueue.filter(c => (c.wrongCount || getRecord(c.char).wrong) >= 2).length;
     setText('reviewInfo', t('reviewInfo', hardCount));
@@ -1265,6 +1783,7 @@ function applyI18n() {
   const current = state.currentQueue[state.currentCharIndex];
   if (current) {
     document.getElementById('hint').textContent = charHint(current) + ' ' + current.emoji;
+    renderWordPanel(current);
   }
   updateUI();
 }
@@ -1280,6 +1799,10 @@ function switchLanguage() {
 const DB_NAME = 'charGameDB';
 const STORE_NAME = 'handles';
 const HANDLE_KEY = 'csvFileHandle';
+
+function csvHandleKey() {
+  return currentUser ? `${HANDLE_KEY}:${currentUser}` : HANDLE_KEY;
+}
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -1299,7 +1822,7 @@ async function saveHandle(handle) {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readwrite');
-    tx.objectStore(STORE_NAME).put(handle, HANDLE_KEY);
+    tx.objectStore(STORE_NAME).put(handle, csvHandleKey());
     tx.oncomplete = resolve;
     tx.onerror = reject;
   });
@@ -1310,7 +1833,7 @@ async function loadHandle() {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, 'readonly');
-      const req = tx.objectStore(STORE_NAME).get(HANDLE_KEY);
+      const req = tx.objectStore(STORE_NAME).get(csvHandleKey());
       req.onsuccess = () => resolve(req.result);
       req.onerror = reject;
     });
@@ -1322,7 +1845,7 @@ async function clearHandle() {
     const db = await openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, 'readwrite');
-      tx.objectStore(STORE_NAME).delete(HANDLE_KEY);
+      tx.objectStore(STORE_NAME).delete(csvHandleKey());
       tx.oncomplete = resolve;
       tx.onerror = reject;
     });
@@ -1406,6 +1929,7 @@ async function openCsvFile() {
         state.mastered[ch] = true;
       }
     });
+    syncPetFromProgress(false);
 
     updateFileStatusUI('connected');
     updateUI();
@@ -1455,6 +1979,7 @@ async function autoReconnectLastFile() {
             state.mastered[ch] = true;
           }
         });
+        syncPetFromProgress(false);
 
         updateFileStatusUI('connected');
         updateUI();
@@ -1563,39 +2088,256 @@ function markDirty() {
   }, 2000);
 }
 
+// ====== 用户登录 ======
+function normalizeUsername(value) {
+  return (value || '').trim();
+}
+
+function userStateKey(username) {
+  return AUTH_USER_STATE_PREFIX + username;
+}
+
+function authToken() {
+  return localStorage.getItem(AUTH_TOKEN_KEY) || '';
+}
+
+async function apiRequest(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  };
+  const token = authToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const response = await fetch(path, {
+    ...options,
+    headers,
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data.error || 'SERVER_ERROR');
+    error.code = data.error || 'SERVER_ERROR';
+    throw error;
+  }
+  return data;
+}
+
+function authErrorText(error) {
+  const code = error && (error.code || error.message);
+  if (code === 'USER_EXISTS') return t('authUserExists');
+  if (code === 'USER_NOT_FOUND') return t('authUserNotFound');
+  if (code === 'WRONG_PASSWORD') return t('authWrongPassword');
+  if (code === 'MISSING_FIELDS') return t('authEmpty');
+  return state.currentLanguage === 'en'
+    ? 'Server connection failed. Please try again.'
+    : '连接服务器失败，请稍后再试';
+}
+
+function setAuthMode(mode) {
+  authMode = mode === 'register' ? 'register' : 'login';
+  renderAuthUI();
+}
+
+function renderAuthUI(message = '') {
+  const isRegister = authMode === 'register';
+  setText('authTitle', t('authTitle'));
+  setText('authSubtitle', t('authSubtitle'));
+  setText('authLoginTab', t('authLoginTab'));
+  setText('authRegisterTab', t('authRegisterTab'));
+  setText('btnAuthSubmit', isRegister ? t('authRegisterButton') : t('authLoginButton'));
+  setText('btnAuthLanguage', t('languageButton'));
+  setText('btnLogout', t('authLogout'));
+  setText('authMessage', message);
+
+  const username = document.getElementById('authUsername');
+  const password = document.getElementById('authPassword');
+  if (username) username.placeholder = t('authUsernamePlaceholder');
+  if (password) password.placeholder = t('authPasswordPlaceholder');
+
+  document.getElementById('authLoginTab')?.classList.toggle('active', !isRegister);
+  document.getElementById('authRegisterTab')?.classList.toggle('active', isRegister);
+}
+
+function resetProgressState() {
+  state.mastered = {};
+  state.stars = 0;
+  state.records = {};
+  state.currentLevel = 0;
+  state.currentCharIndex = 0;
+  state.currentQueue = [];
+  state.currentMode = 'learn';
+  state.currentFilter = 'all';
+  state.currentTab = 'box';
+  state.petLevel = 1;
+  state.petClaimedLevels = {};
+  LEVELS.forEach((lv, i) => lv.unlocked = i === 0);
+}
+
+function snapshotState() {
+  return {
+    mastered: state.mastered,
+    stars: state.stars,
+    records: state.records,
+    currentLanguage: state.currentLanguage,
+    petLevel: state.petLevel,
+    petClaimedLevels: state.petClaimedLevels,
+  };
+}
+
+function applySavedState(saved) {
+  resetProgressState();
+  if (!saved) return;
+  state.mastered = saved.mastered || {};
+  state.stars = saved.stars || 0;
+  state.records = saved.records || {};
+  state.petLevel = saved.petLevel || 1;
+  state.petClaimedLevels = saved.petClaimedLevels || {};
+  if (saved.currentLanguage === 'zh' || saved.currentLanguage === 'en') {
+    state.currentLanguage = saved.currentLanguage;
+  }
+  LEVELS.forEach((lv, i) => {
+    if (i === 0) return;
+    const prevChars = LEVELS[i-1].chars;
+    const allMastered = prevChars.every(c => state.mastered[c.char]);
+    if (allMastered) lv.unlocked = true;
+  });
+  syncPetFromProgress(false);
+}
+
+function updateUserUI() {
+  const chip = document.getElementById('userChip');
+  const name = document.getElementById('currentUserName');
+  if (!chip || !name) return;
+  chip.hidden = !currentUser;
+  name.textContent = currentUser;
+  setText('btnLogout', t('authLogout'));
+}
+
+function showAuthScreen(message = '') {
+  document.getElementById('authScreen').hidden = false;
+  renderAuthUI(message);
+  updateUserUI();
+  setTimeout(() => document.getElementById('authUsername')?.focus(), 0);
+}
+
+function hideAuthScreen() {
+  document.getElementById('authScreen').hidden = true;
+}
+
+function initialServerState(username) {
+  if (localStorage.getItem(AUTH_SERVER_MIGRATED_KEY)) return null;
+  const candidates = [
+    localStorage.getItem(userStateKey(username)),
+    localStorage.getItem('charGame2'),
+  ].filter(Boolean);
+
+  for (const item of candidates) {
+    try {
+      const parsed = JSON.parse(item);
+      if (parsed && typeof parsed === 'object') return parsed;
+    } catch(e) {}
+  }
+  return snapshotState();
+}
+
+async function submitAuth() {
+  const username = normalizeUsername(document.getElementById('authUsername')?.value);
+  const password = document.getElementById('authPassword')?.value || '';
+  if (!username || !password) {
+    renderAuthUI(t('authEmpty'));
+    return;
+  }
+
+  const submitButton = document.getElementById('btnAuthSubmit');
+  submitButton.disabled = true;
+  try {
+    const result = await apiRequest(authMode === 'register' ? '/api/register' : '/api/login', {
+      method: 'POST',
+      body: authMode === 'register'
+        ? { username, password, initialState: initialServerState(username) }
+        : { username, password },
+    });
+    if (authMode === 'register') {
+      localStorage.setItem(AUTH_SERVER_MIGRATED_KEY, '1');
+    }
+    loginUser(result);
+  } catch(error) {
+    renderAuthUI(authErrorText(error));
+  } finally {
+    submitButton.disabled = false;
+  }
+}
+
+function loginUser(session) {
+  currentUser = session.username;
+  localStorage.setItem(AUTH_CURRENT_USER_KEY, session.username);
+  if (session.token) localStorage.setItem(AUTH_TOKEN_KEY, session.token);
+  resetCsvState();
+  applySavedState(session.state || null);
+  localStorage.setItem(userStateKey(session.username), JSON.stringify(snapshotState()));
+  hideAuthScreen();
+  updateUserUI();
+  updateFileStatusUI('local');
+  autoReconnectLastFile();
+  buildQueue();
+  nextChar();
+  applyI18n();
+}
+
+async function logoutUser() {
+  await saveState();
+  await apiRequest('/api/logout', { method: 'POST' }).catch(() => {});
+  currentUser = '';
+  resetCsvState();
+  localStorage.removeItem(AUTH_CURRENT_USER_KEY);
+  localStorage.removeItem(AUTH_TOKEN_KEY);
+  document.getElementById('authPassword').value = '';
+  showAuthScreen();
+}
+
+async function initAuth() {
+  const token = authToken();
+  authMode = token ? 'login' : 'register';
+  renderAuthUI();
+  if (token) {
+    try {
+      loginUser(await apiRequest('/api/me'));
+      return;
+    } catch(e) {
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem(AUTH_CURRENT_USER_KEY);
+      currentUser = '';
+    }
+  }
+  showAuthScreen();
+}
+
 // ====== 本地存储 ======
-function loadState() {
+async function loadState() {
   try {
     const savedLanguage = localStorage.getItem('charGameLanguage');
     if (savedLanguage === 'zh' || savedLanguage === 'en') state.currentLanguage = savedLanguage;
-    const saved = localStorage.getItem('charGame2');
-    if (saved) {
-      const s = JSON.parse(saved);
-      state.mastered = s.mastered || {};
-      state.stars = s.stars || 0;
-      state.records = s.records || {};
-      if (!savedLanguage && (s.currentLanguage === 'zh' || s.currentLanguage === 'en')) {
-        state.currentLanguage = s.currentLanguage;
-      }
-      LEVELS.forEach((lv, i) => {
-        if (i === 0) return;
-        const prevChars = LEVELS[i-1].chars;
-        const allMastered = prevChars.every(c => state.mastered[c.char]);
-        if (allMastered) lv.unlocked = true;
-      });
+    if (!currentUser) {
+      applySavedState(null);
+      return;
     }
+    const result = await apiRequest('/api/state');
+    applySavedState(result.state || null);
+    localStorage.setItem(userStateKey(currentUser), JSON.stringify(snapshotState()));
+    if (savedLanguage === 'zh' || savedLanguage === 'en') state.currentLanguage = savedLanguage;
   } catch(e) {}
 }
 
 function saveState() {
   try {
-    localStorage.setItem('charGame2', JSON.stringify({
-      mastered: state.mastered,
-      stars: state.stars,
-      records: state.records,
-      currentLanguage: state.currentLanguage,
-    }));
-  } catch(e) {}
+    if (!currentUser) return Promise.resolve();
+    const payload = snapshotState();
+    localStorage.setItem(userStateKey(currentUser), JSON.stringify(payload));
+    return apiRequest('/api/state', { method: 'PUT', body: { state: payload } }).catch(() => {});
+  } catch(e) {
+    return Promise.resolve();
+  }
 }
 
 function getRecord(char) {
@@ -1748,10 +2490,12 @@ function shuffle(arr) {
 }
 
 function showChar(data) {
+  wordPanelVisible = false;
   document.getElementById('pinyin').textContent = data.pinyin;
   document.getElementById('character').textContent = data.char;
   document.getElementById('hint').textContent = charHint(data) + ' ' + data.emoji;
   document.getElementById('charBg').textContent = data.char;
+  renderWordPanel(data);
 
   const rec = getRecord(data.char);
   document.getElementById('charKnowCount').textContent = rec.know;
@@ -1844,6 +2588,13 @@ function checkLevelUnlock() {
 function showCelebration() {
   const lv = LEVELS[state.currentLevel];
   const masteredInLv = lv.chars.filter(c => state.mastered[c.char]).length;
+  const petUnlock = state.currentMode === 'learn' && masteredInLv === lv.chars.length
+    ? syncPetFromProgress(true, state.currentLevel + 1)
+    : null;
+  if (petUnlock) {
+    saveState();
+    setTimeout(() => spawnStars(window.innerWidth / 2, window.innerHeight / 2, 10), 250);
+  }
   spawnConfetti(60);
   const overlay = document.createElement('div');
   overlay.className = 'celebration-overlay';
@@ -1852,6 +2603,17 @@ function showCelebration() {
       <div class="big-emoji">🏆</div>
       <h2>${t('celebrationTitle')}</h2>
       <p>${t('celebrationMessage', levelName(state.currentLevel), state.currentMode)}</p>
+      ${petUnlock ? `
+        <div class="pet-unlock">
+          <div class="pet-unlock-top">
+            <img class="pet-unlock-avatar" src="${petImageForLevel(state.petLevel)}" alt="${t('petImageAlt', Math.min(state.petLevel || 1, PET_MAX_IMAGE_LEVEL))}">
+            <div>
+              <h3>${t('petSkillUnlockedTitle', state.petLevel)}</h3>
+              <p>${t('petSkillUnlockedBody', petSkillText(petUnlock))}</p>
+            </div>
+          </div>
+        </div>
+      ` : ''}
       <div class="stats-row">
         <div class="stat-item"><div class="stat-num">${masteredInLv}</div><div class="stat-label">${t('learnedChars')}</div></div>
         <div class="stat-item"><div class="stat-num">⭐${state.stars}</div><div class="stat-label">${t('totalStars')}</div></div>
@@ -1944,6 +2706,7 @@ function updateUI() {
   const pct = (masteredInLv / lv.chars.length) * 100;
   document.getElementById('progressFill').style.width = pct + '%';
 
+  renderPetPanel();
   renderMasteredGrid();
 }
 
@@ -1995,8 +2758,6 @@ function renderMasteredGrid() {
 
 // ====== 初始化 ======
 function init() {
-  loadState();
-
   // 背景装饰
   const decos = ['🌟', '⭐', '🌈', '🎈', '🎵', '🌸', '🦋', '🍭', '📚', '🎨', '🐱', '🐰'];
   const bgDeco = document.getElementById('bgDeco');
@@ -2018,8 +2779,23 @@ function init() {
 
   // 按钮事件
   document.getElementById('btnLanguage').onclick = switchLanguage;
+  document.getElementById('btnAuthLanguage').onclick = switchLanguage;
+  document.getElementById('authLoginTab').onclick = () => setAuthMode('login');
+  document.getElementById('authRegisterTab').onclick = () => setAuthMode('register');
+  document.getElementById('btnAuthSubmit').onclick = submitAuth;
+  document.getElementById('authPassword').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitAuth();
+  });
+  document.getElementById('authUsername').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('authPassword').focus();
+  });
+  document.getElementById('btnLogout').onclick = logoutUser;
   document.getElementById('btnYes').onclick = handleKnow;
   document.getElementById('btnNo').onclick = handleDontKnow;
+  document.getElementById('btnWords').onclick = (event) => {
+    event.stopPropagation();
+    toggleWordPanel();
+  };
   document.getElementById('charCard').onclick = doSpeak;
 
   document.getElementById('btnReset').onclick = () => {
@@ -2027,6 +2803,8 @@ function init() {
       state.mastered = {};
       state.stars = 0;
       state.records = {};
+      state.petLevel = 1;
+      state.petClaimedLevels = {};
       saveState();
       markDirty();
       LEVELS.forEach((lv, i) => lv.unlocked = i === 0);
@@ -2038,18 +2816,15 @@ function init() {
 
   // 键盘快捷键
   document.addEventListener('keydown', (e) => {
+    if (!document.getElementById('authScreen').hidden) return;
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); handleKnow(); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); handleDontKnow(); }
   });
 
-  // 先显示本地模式，然后尝试自动恢复上次CSV
+  // 先显示本地模式，登录后再恢复对应用户的数据。
   updateFileStatusUI('local');
-  autoReconnectLastFile();
-
-  buildQueue();
-  nextChar();
-  updateUI();
   applyI18n();
+  initAuth();
 }
 
 init();
