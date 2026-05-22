@@ -102,21 +102,6 @@
   }
   .header h1 span { font-size: 26px; }
   .header-actions { display: flex; align-items: center; gap: 8px; }
-  .user-chip {
-    display: flex; align-items: center; gap: 6px;
-    background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 999px; padding: 4px 6px 4px 9px; color: #fff;
-    font-size: 11px; font-weight: 800; max-width: 130px;
-  }
-  .user-chip[hidden] { display: none; }
-  .user-chip span {
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .user-chip button {
-    border: none; border-radius: 999px; background: rgba(255,255,255,0.9);
-    color: #764ba2; padding: 3px 7px; font-size: 10px; font-weight: 900;
-    cursor: pointer; flex-shrink: 0;
-  }
   .lang-toggle {
     background: rgba(255,255,255,0.9); color: #764ba2;
     border: 1px solid rgba(255,255,255,0.95); border-radius: 16px;
@@ -132,50 +117,6 @@
   }
   .stat-badge.green { background: rgba(107,203,119,0.3); }
   .stat-badge.red { background: rgba(255,107,107,0.3); }
-
-  /* ====== 登录注册 ====== */
-  .auth-screen {
-    position: fixed; inset: 0; z-index: 200;
-    display: grid; place-items: center; padding: 18px;
-    background: linear-gradient(135deg, rgba(102,126,234,0.96), rgba(118,75,162,0.96));
-  }
-  .auth-screen[hidden] { display: none; }
-  .auth-card {
-    width: min(100%, 360px); background: rgba(255,255,255,0.96);
-    border-radius: 22px; padding: 24px; color: #2e2a4a;
-    box-shadow: 0 24px 70px rgba(25, 15, 58, 0.36);
-  }
-  .auth-top {
-    display: flex; justify-content: space-between; align-items: center; gap: 10px;
-    margin-bottom: 14px;
-  }
-  .auth-logo { font-size: 36px; line-height: 1; }
-  .auth-card h2 { font-size: 22px; margin: 0 0 4px; }
-  .auth-card p { color: #69627c; font-size: 13px; line-height: 1.45; margin-bottom: 16px; }
-  .auth-tabs {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-    background: #f1edff; border-radius: 14px; padding: 5px; margin-bottom: 14px;
-  }
-  .auth-tab {
-    border: none; border-radius: 10px; background: transparent; color: #655a7c;
-    padding: 8px; font-size: 13px; font-weight: 900; cursor: pointer;
-  }
-  .auth-tab.active { background: #fff; color: #764ba2; box-shadow: 0 6px 16px rgba(76,57,120,0.12); }
-  .auth-form { display: grid; gap: 10px; }
-  .auth-form input {
-    width: 100%; border: 1px solid #ddd6f3; border-radius: 14px;
-    padding: 12px 13px; font-size: 15px; outline: none;
-  }
-  .auth-form input:focus { border-color: #764ba2; box-shadow: 0 0 0 3px rgba(118,75,162,0.12); }
-  .auth-submit {
-    border: none; border-radius: 16px; padding: 12px 16px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff; font-size: 15px; font-weight: 900; cursor: pointer;
-  }
-  .auth-message {
-    min-height: 18px; color: #FF6B6B; font-size: 12px; font-weight: 800;
-    text-align: center; margin-top: 2px;
-  }
 
   /* ====== 文件状态条 ====== */
   .file-status-bar {
@@ -633,38 +574,11 @@
 
 <div class="bg-deco" id="bgDeco"></div>
 
-<div class="auth-screen" id="authScreen" hidden>
-  <div class="auth-card">
-    <div class="auth-top">
-      <div>
-        <div class="auth-logo">📚</div>
-        <h2 id="authTitle">小朋友登录</h2>
-      </div>
-      <button class="lang-toggle" id="btnAuthLanguage" type="button">English</button>
-    </div>
-    <p id="authSubtitle">每个小朋友用自己的名字进入，学习进度会分开保存。</p>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="authLoginTab" type="button">登录</button>
-      <button class="auth-tab" id="authRegisterTab" type="button">注册</button>
-    </div>
-    <div class="auth-form">
-      <input id="authUsername" type="text" autocomplete="username" maxlength="24" placeholder="用户名">
-      <input id="authPassword" type="password" autocomplete="current-password" maxlength="32" placeholder="密码">
-      <button class="auth-submit" id="btnAuthSubmit" type="button">登录</button>
-      <div class="auth-message" id="authMessage"></div>
-    </div>
-  </div>
-</div>
-
 <div class="app">
   <!-- 顶部 -->
   <div class="header">
     <h1><span>📚</span> <span id="appTitle">认字乐园</span></h1>
     <div class="header-actions">
-      <div class="user-chip" id="userChip" hidden>
-        <span id="currentUserName"></span>
-        <button id="btnLogout" type="button">退出</button>
-      </div>
       <button class="lang-toggle" id="btnLanguage" type="button">English</button>
       <div class="stats">
         <div class="stat-badge green">✅<span id="knowCount">0</span></div>
@@ -1108,10 +1022,6 @@ const LEVELS = [
 
 // ====== CSV 文件名 ======
 const CSV_FILENAME = '小神童认字记录.csv';
-const AUTH_TOKEN_KEY = 'charGameAuthToken';
-const AUTH_CURRENT_USER_KEY = 'charGameCurrentUser';
-const AUTH_USER_STATE_PREFIX = 'charGame2:user:';
-const AUTH_SERVER_MIGRATED_KEY = 'charGameServerMigrated';
 
 // ====== 双语文案 ======
 const translations = {
@@ -1119,20 +1029,6 @@ const translations = {
     pageTitle: '小神童认字乐园',
     appTitle: '认字乐园',
     languageButton: 'English',
-    authTitle: '小朋友登录',
-    authSubtitle: '每个小朋友用自己的名字进入，学习进度会分开保存。',
-    authLoginTab: '登录',
-    authRegisterTab: '注册',
-    authUsernamePlaceholder: '用户名',
-    authPasswordPlaceholder: '密码',
-    authLoginButton: '登录',
-    authRegisterButton: '注册',
-    authLogout: '退出',
-    authEmpty: '请输入用户名和密码',
-    authUserExists: '这个用户名已经注册啦',
-    authUserNotFound: '没有这个用户，请先注册',
-    authWrongPassword: '密码不对，请再试一次',
-    authRegisterSuccess: '注册成功，开始学习！',
     openCsv: '📂 连接CSV',
     switchCsv: '🔄 切换文件',
     save: '💾 保存',
@@ -1192,20 +1088,6 @@ const translations = {
     pageTitle: 'Little Prodigy Hanzi Garden',
     appTitle: 'Hanzi Garden',
     languageButton: '中文',
-    authTitle: 'Kid Login',
-    authSubtitle: 'Each child signs in with a name, and progress stays separate.',
-    authLoginTab: 'Login',
-    authRegisterTab: 'Register',
-    authUsernamePlaceholder: 'Username',
-    authPasswordPlaceholder: 'Password',
-    authLoginButton: 'Login',
-    authRegisterButton: 'Register',
-    authLogout: 'Logout',
-    authEmpty: 'Enter a username and password',
-    authUserExists: 'That username is already registered',
-    authUserNotFound: 'No user found. Please register first.',
-    authWrongPassword: 'Wrong password. Try again.',
-    authRegisterSuccess: 'Registered. Ready to learn!',
     openCsv: '📂 Link CSV',
     switchCsv: '🔄 Change file',
     save: '💾 Save',
@@ -1587,8 +1469,6 @@ let state = {
 };
 
 let wordPanelVisible = false;
-let authMode = 'login';
-let currentUser = '';
 
 // ====== CSV 文件状态 ======
 let csvState = {
@@ -1598,16 +1478,6 @@ let csvState = {
   fileName: '',
   status: 'local',
 };
-
-function resetCsvState() {
-  csvState = {
-    handle: null,
-    isConnected: false,
-    isDirty: false,
-    fileName: '',
-    status: 'local',
-  };
-}
 
 function t(key, ...args) {
   const langPack = translations[state.currentLanguage] || translations.zh;
@@ -1752,8 +1622,6 @@ function applyI18n() {
   document.title = t('pageTitle');
   setText('appTitle', t('appTitle'));
   setText('btnLanguage', t('languageButton'));
-  renderAuthUI();
-  updateUserUI();
   setText('btnExportCsv', t('save'));
   setText('modeLearnText', t('learnMode'));
   setText('modeLearnSub', t('learnSub'));
@@ -1801,7 +1669,7 @@ const STORE_NAME = 'handles';
 const HANDLE_KEY = 'csvFileHandle';
 
 function csvHandleKey() {
-  return currentUser ? `${HANDLE_KEY}:${currentUser}` : HANDLE_KEY;
+  return HANDLE_KEY;
 }
 
 function openDB() {
@@ -2088,256 +1956,48 @@ function markDirty() {
   }, 2000);
 }
 
-// ====== 用户登录 ======
-function normalizeUsername(value) {
-  return (value || '').trim();
-}
-
-function userStateKey(username) {
-  return AUTH_USER_STATE_PREFIX + username;
-}
-
-function authToken() {
-  return localStorage.getItem(AUTH_TOKEN_KEY) || '';
-}
-
-async function apiRequest(path, options = {}) {
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {}),
-  };
-  const token = authToken();
-  if (token) headers.Authorization = `Bearer ${token}`;
-
-  const response = await fetch(path, {
-    ...options,
-    headers,
-    body: options.body ? JSON.stringify(options.body) : undefined,
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const error = new Error(data.error || 'SERVER_ERROR');
-    error.code = data.error || 'SERVER_ERROR';
-    throw error;
-  }
-  return data;
-}
-
-function authErrorText(error) {
-  const code = error && (error.code || error.message);
-  if (code === 'USER_EXISTS') return t('authUserExists');
-  if (code === 'USER_NOT_FOUND') return t('authUserNotFound');
-  if (code === 'WRONG_PASSWORD') return t('authWrongPassword');
-  if (code === 'MISSING_FIELDS') return t('authEmpty');
-  return state.currentLanguage === 'en'
-    ? 'Server connection failed. Please try again.'
-    : '连接服务器失败，请稍后再试';
-}
-
-function setAuthMode(mode) {
-  authMode = mode === 'register' ? 'register' : 'login';
-  renderAuthUI();
-}
-
-function renderAuthUI(message = '') {
-  const isRegister = authMode === 'register';
-  setText('authTitle', t('authTitle'));
-  setText('authSubtitle', t('authSubtitle'));
-  setText('authLoginTab', t('authLoginTab'));
-  setText('authRegisterTab', t('authRegisterTab'));
-  setText('btnAuthSubmit', isRegister ? t('authRegisterButton') : t('authLoginButton'));
-  setText('btnAuthLanguage', t('languageButton'));
-  setText('btnLogout', t('authLogout'));
-  setText('authMessage', message);
-
-  const username = document.getElementById('authUsername');
-  const password = document.getElementById('authPassword');
-  if (username) username.placeholder = t('authUsernamePlaceholder');
-  if (password) password.placeholder = t('authPasswordPlaceholder');
-
-  document.getElementById('authLoginTab')?.classList.toggle('active', !isRegister);
-  document.getElementById('authRegisterTab')?.classList.toggle('active', isRegister);
-}
-
-function resetProgressState() {
-  state.mastered = {};
-  state.stars = 0;
-  state.records = {};
-  state.currentLevel = 0;
-  state.currentCharIndex = 0;
-  state.currentQueue = [];
-  state.currentMode = 'learn';
-  state.currentFilter = 'all';
-  state.currentTab = 'box';
-  state.petLevel = 1;
-  state.petClaimedLevels = {};
-  LEVELS.forEach((lv, i) => lv.unlocked = i === 0);
-}
-
-function snapshotState() {
-  return {
-    mastered: state.mastered,
-    stars: state.stars,
-    records: state.records,
-    currentLanguage: state.currentLanguage,
-    petLevel: state.petLevel,
-    petClaimedLevels: state.petClaimedLevels,
-  };
-}
-
-function applySavedState(saved) {
-  resetProgressState();
-  if (!saved) return;
-  state.mastered = saved.mastered || {};
-  state.stars = saved.stars || 0;
-  state.records = saved.records || {};
-  state.petLevel = saved.petLevel || 1;
-  state.petClaimedLevels = saved.petClaimedLevels || {};
-  if (saved.currentLanguage === 'zh' || saved.currentLanguage === 'en') {
-    state.currentLanguage = saved.currentLanguage;
-  }
-  LEVELS.forEach((lv, i) => {
-    if (i === 0) return;
-    const prevChars = LEVELS[i-1].chars;
-    const allMastered = prevChars.every(c => state.mastered[c.char]);
-    if (allMastered) lv.unlocked = true;
-  });
-  syncPetFromProgress(false);
-}
-
-function updateUserUI() {
-  const chip = document.getElementById('userChip');
-  const name = document.getElementById('currentUserName');
-  if (!chip || !name) return;
-  chip.hidden = !currentUser;
-  name.textContent = currentUser;
-  setText('btnLogout', t('authLogout'));
-}
-
-function showAuthScreen(message = '') {
-  document.getElementById('authScreen').hidden = false;
-  renderAuthUI(message);
-  updateUserUI();
-  setTimeout(() => document.getElementById('authUsername')?.focus(), 0);
-}
-
-function hideAuthScreen() {
-  document.getElementById('authScreen').hidden = true;
-}
-
-function initialServerState(username) {
-  if (localStorage.getItem(AUTH_SERVER_MIGRATED_KEY)) return null;
-  const candidates = [
-    localStorage.getItem(userStateKey(username)),
-    localStorage.getItem('charGame2'),
-  ].filter(Boolean);
-
-  for (const item of candidates) {
-    try {
-      const parsed = JSON.parse(item);
-      if (parsed && typeof parsed === 'object') return parsed;
-    } catch(e) {}
-  }
-  return snapshotState();
-}
-
-async function submitAuth() {
-  const username = normalizeUsername(document.getElementById('authUsername')?.value);
-  const password = document.getElementById('authPassword')?.value || '';
-  if (!username || !password) {
-    renderAuthUI(t('authEmpty'));
-    return;
-  }
-
-  const submitButton = document.getElementById('btnAuthSubmit');
-  submitButton.disabled = true;
-  try {
-    const result = await apiRequest(authMode === 'register' ? '/api/register' : '/api/login', {
-      method: 'POST',
-      body: authMode === 'register'
-        ? { username, password, initialState: initialServerState(username) }
-        : { username, password },
-    });
-    if (authMode === 'register') {
-      localStorage.setItem(AUTH_SERVER_MIGRATED_KEY, '1');
-    }
-    loginUser(result);
-  } catch(error) {
-    renderAuthUI(authErrorText(error));
-  } finally {
-    submitButton.disabled = false;
-  }
-}
-
-function loginUser(session) {
-  currentUser = session.username;
-  localStorage.setItem(AUTH_CURRENT_USER_KEY, session.username);
-  if (session.token) localStorage.setItem(AUTH_TOKEN_KEY, session.token);
-  resetCsvState();
-  applySavedState(session.state || null);
-  localStorage.setItem(userStateKey(session.username), JSON.stringify(snapshotState()));
-  hideAuthScreen();
-  updateUserUI();
-  updateFileStatusUI('local');
-  autoReconnectLastFile();
-  buildQueue();
-  nextChar();
-  applyI18n();
-}
-
-async function logoutUser() {
-  await saveState();
-  await apiRequest('/api/logout', { method: 'POST' }).catch(() => {});
-  currentUser = '';
-  resetCsvState();
-  localStorage.removeItem(AUTH_CURRENT_USER_KEY);
-  localStorage.removeItem(AUTH_TOKEN_KEY);
-  document.getElementById('authPassword').value = '';
-  showAuthScreen();
-}
-
-async function initAuth() {
-  const token = authToken();
-  authMode = token ? 'login' : 'register';
-  renderAuthUI();
-  if (token) {
-    try {
-      loginUser(await apiRequest('/api/me'));
-      return;
-    } catch(e) {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(AUTH_CURRENT_USER_KEY);
-      currentUser = '';
-    }
-  }
-  showAuthScreen();
-}
-
 // ====== 本地存储 ======
-async function loadState() {
+function cachedAccountState() {
+  const accountName = localStorage.getItem('charGameCurrentUser');
+  return accountName ? localStorage.getItem(`charGame2:user:${accountName}`) : '';
+}
+
+function loadState() {
   try {
     const savedLanguage = localStorage.getItem('charGameLanguage');
     if (savedLanguage === 'zh' || savedLanguage === 'en') state.currentLanguage = savedLanguage;
-    if (!currentUser) {
-      applySavedState(null);
-      return;
+    const saved = localStorage.getItem('charGame2') || cachedAccountState();
+    if (saved) {
+      const s = JSON.parse(saved);
+      state.mastered = s.mastered || {};
+      state.stars = s.stars || 0;
+      state.records = s.records || {};
+      state.petLevel = s.petLevel || 1;
+      state.petClaimedLevels = s.petClaimedLevels || {};
+      if (!savedLanguage && (s.currentLanguage === 'zh' || s.currentLanguage === 'en')) {
+        state.currentLanguage = s.currentLanguage;
+      }
+      LEVELS.forEach((lv, i) => {
+        if (i === 0) return;
+        const prevChars = LEVELS[i-1].chars;
+        if (prevChars.every(c => state.mastered[c.char])) lv.unlocked = true;
+      });
+      syncPetFromProgress(false);
     }
-    const result = await apiRequest('/api/state');
-    applySavedState(result.state || null);
-    localStorage.setItem(userStateKey(currentUser), JSON.stringify(snapshotState()));
-    if (savedLanguage === 'zh' || savedLanguage === 'en') state.currentLanguage = savedLanguage;
   } catch(e) {}
 }
 
 function saveState() {
   try {
-    if (!currentUser) return Promise.resolve();
-    const payload = snapshotState();
-    localStorage.setItem(userStateKey(currentUser), JSON.stringify(payload));
-    return apiRequest('/api/state', { method: 'PUT', body: { state: payload } }).catch(() => {});
-  } catch(e) {
-    return Promise.resolve();
-  }
+    localStorage.setItem('charGame2', JSON.stringify({
+      mastered: state.mastered,
+      stars: state.stars,
+      records: state.records,
+      currentLanguage: state.currentLanguage,
+      petLevel: state.petLevel,
+      petClaimedLevels: state.petClaimedLevels,
+    }));
+  } catch(e) {}
 }
 
 function getRecord(char) {
@@ -2758,6 +2418,8 @@ function renderMasteredGrid() {
 
 // ====== 初始化 ======
 function init() {
+  loadState();
+
   // 背景装饰
   const decos = ['🌟', '⭐', '🌈', '🎈', '🎵', '🌸', '🦋', '🍭', '📚', '🎨', '🐱', '🐰'];
   const bgDeco = document.getElementById('bgDeco');
@@ -2779,17 +2441,6 @@ function init() {
 
   // 按钮事件
   document.getElementById('btnLanguage').onclick = switchLanguage;
-  document.getElementById('btnAuthLanguage').onclick = switchLanguage;
-  document.getElementById('authLoginTab').onclick = () => setAuthMode('login');
-  document.getElementById('authRegisterTab').onclick = () => setAuthMode('register');
-  document.getElementById('btnAuthSubmit').onclick = submitAuth;
-  document.getElementById('authPassword').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') submitAuth();
-  });
-  document.getElementById('authUsername').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') document.getElementById('authPassword').focus();
-  });
-  document.getElementById('btnLogout').onclick = logoutUser;
   document.getElementById('btnYes').onclick = handleKnow;
   document.getElementById('btnNo').onclick = handleDontKnow;
   document.getElementById('btnWords').onclick = (event) => {
@@ -2816,15 +2467,18 @@ function init() {
 
   // 键盘快捷键
   document.addEventListener('keydown', (e) => {
-    if (!document.getElementById('authScreen').hidden) return;
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); handleKnow(); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); handleDontKnow(); }
   });
 
-  // 先显示本地模式，登录后再恢复对应用户的数据。
+  // 先显示本地模式，然后尝试自动恢复上次CSV。
   updateFileStatusUI('local');
+  autoReconnectLastFile();
+
+  buildQueue();
+  nextChar();
+  updateUI();
   applyI18n();
-  initAuth();
 }
 
 init();

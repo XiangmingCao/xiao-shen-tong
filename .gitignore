@@ -2,7 +2,5 @@
 .playwright-cli/
 小神童认字记录.csv
 node_modules/
-data/
 output/
 .playwright-mcp/
-.env
